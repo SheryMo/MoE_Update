@@ -1,0 +1,301 @@
+/root/miniconda3/lib/python3.10/site-packages/huggingface_hub/file_download.py:795: FutureWarning: `resume_download` is deprecated and will be removed in version 1.0.0. Downloads always resume when possible. If you want to force a new download, use `force_download=True`.
+  warnings.warn(
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+2025-01-13:00:14:03,724 INFO     [huggingface.py:496] Model type cannot be determined. Using default model type 'causal'
+Special tokens have been added in the vocabulary, make sure the associated word embeddings are fine-tuned or trained.
+2025-01-13:00:14:03,923 INFO     [huggingface.py:352] Model parallel was set to True, setting max memory per GPU to {0: 24868749312} and device map to auto
+Loading checkpoint shards:   0%|                                                                 | 0/17 [00:00<?, ?it/s]Loading checkpoint shards:   6%|███▎                                                     | 1/17 [00:00<00:15,  1.06it/s]Loading checkpoint shards:  12%|██████▋                                                  | 2/17 [00:01<00:14,  1.06it/s]Loading checkpoint shards:  18%|██████████                                               | 3/17 [00:02<00:13,  1.04it/s]Loading checkpoint shards:  24%|█████████████▍                                           | 4/17 [00:03<00:12,  1.04it/s]Loading checkpoint shards:  29%|████████████████▊                                        | 5/17 [00:04<00:08,  1.37it/s]Loading checkpoint shards: 100%|████████████████████████████████████████████████████████| 17/17 [00:04<00:00,  4.10it/s]
+2025-01-13:00:14:10,137 WARNING  [big_modeling.py:440] Some parameters are on the meta device because they were offloaded to the disk.
+2025-01-13:00:14:10,462 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
+2025-01-13:00:14:10,463 INFO     [evaluator.py:217] Using pre-initialized model
+2025-01-13:00:14:16,696 WARNING  [evaluator.py:270] Overwriting default num_fewshot of squad_completion from None to 0
+2025-01-13:00:14:16,697 INFO     [task.py:415] Building contexts for squad_completion on rank 0...
+[[1, 3, 6, 1, 3, 0, 6, 6, 6, 5, 7, 2, 3, 6, 3, 1], [3, 3, 1, 1, 3, 1, 2, 0, 3, 2, 3, 3, 6, 2, 1, 7], [6, 3, 0, 5, 3, 6, 2, 4, 6, 6, 1, 3, 3, 2, 3, 7], [5, 7, 1, 5, 3, 2, 6, 6, 2, 3, 2, 7, 4, 1, 5, 7], [1, 3, 0, 7, 0, 6, 0, 0, 0, 1, 6, 1, 0, 0, 6, 5], [5, 1, 0, 6, 4, 5, 7, 1, 6, 4, 7, 4, 6, 0, 1, 5], [1, 2, 0, 0, 2, 7, 3, 2, 7, 4, 3, 5, 6, 4, 5, 1], [3, 2, 4, 4, 1, 6, 4, 1, 7, 3, 2, 6, 6, 0, 1, 4], [3, 2, 5, 3, 3, 5, 4, 2, 6, 6, 3, 5, 1, 2, 5, 7], [4, 2, 4, 3, 0, 3, 7, 4, 0, 4, 7, 2, 1, 1, 1, 2], [5, 3, 2, 0, 2, 5, 3, 5, 7, 6, 1, 5, 5, 2, 3, 4], [2, 0, 3, 6, 4, 0, 2, 5, 0, 4, 5, 7, 6, 6, 4, 4], [3, 1, 2, 2, 6, 4, 2, 4, 1, 3, 4, 5, 5, 5, 2, 6], [4, 2, 1, 3, 3, 6, 6, 4, 0, 5, 2, 4, 1, 6, 6, 4], [1, 2, 5, 4, 3, 0, 3, 6, 7, 5, 6, 5, 4, 4, 5, 7], [5, 4, 7, 7, 4, 1, 1, 5, 1, 4, 1, 4, 6, 4, 4, 2], [2, 4, 5, 0, 6, 3, 3, 4, 6, 5, 7, 7, 5, 0, 6, 0], [5, 7, 1, 5, 5, 4, 2, 2, 3, 7, 1, 3, 3, 0, 6, 0], [5, 1, 2, 4, 5, 7, 5, 4, 6, 6, 4, 6, 3, 2, 4, 6], [1, 5, 3, 6, 5, 3, 0, 3, 0, 3, 6, 5, 7, 6, 2, 3], [5, 1, 5, 4, 4, 6, 0, 7, 1, 1, 4, 6, 5, 4, 0, 5], [2, 0, 2, 7, 0, 7, 7, 3, 3, 0, 0, 7, 1, 4, 3, 6], [5, 5, 3, 7, 2, 3, 2, 0, 6, 3, 1, 3, 6, 0, 2, 4], [4, 4, 1, 2, 3, 3, 6, 7, 0, 7, 1, 6, 1, 5, 2, 2], [3, 0, 1, 3, 1, 0, 1, 1, 1, 7, 7, 5, 5, 2, 3, 3], [1, 6, 2, 5, 5, 4, 7, 6, 2, 3, 4, 7, 6, 0, 6, 2], [3, 3, 1, 3, 5, 5, 5, 3, 5, 0, 5, 5, 1, 5, 4, 7], [0, 4, 1, 7, 7, 0, 5, 5, 5, 0, 0, 4, 3, 4, 7, 6], [5, 2, 2, 4, 5, 3, 4, 1, 0, 4, 1, 4, 0, 6, 7, 6], [1, 2, 6, 5, 0, 0, 4, 3, 3, 3, 1, 0, 5, 7, 7, 1], [5, 1, 0, 5, 3, 7, 5, 7, 0, 3, 0, 4, 2, 2, 1, 7], [1, 5, 5, 2, 2, 0, 4, 7, 7, 3, 1, 1, 6, 6, 1, 3]]
+1
+1
+tensor(7)
+tensor(2)
+tensor(6)
+tensor(0)
+tensor(12)
+tensor(15)
+done!
+2
+tensor(2)
+tensor(10)
+tensor(6)
+tensor(1)
+tensor(7)
+tensor(3)
+tensor(0)
+tensor(15)
+done!
+3
+tensor(2)
+tensor(5)
+tensor(4)
+tensor(12)
+tensor(0)
+tensor(6)
+tensor(1)
+done!
+4
+tensor(2)
+tensor(0)
+tensor(1)
+tensor(15)
+tensor(5)
+tensor(3)
+done!
+5
+tensor(2)
+tensor(1)
+tensor(4)
+tensor(0)
+tensor(3)
+tensor(6)
+done!
+6
+tensor(2)
+tensor(0)
+tensor(1)
+tensor(6)
+tensor(9)
+tensor(11)
+tensor(12)
+tensor(5)
+done!
+7
+tensor(13)
+tensor(4)
+tensor(1)
+tensor(0)
+tensor(2)
+tensor(5)
+tensor(8)
+done!
+8
+tensor(12)
+tensor(1)
+tensor(0)
+tensor(6)
+tensor(2)
+tensor(8)
+tensor(15)
+done!
+9
+tensor(4)
+tensor(12)
+tensor(1)
+tensor(3)
+tensor(0)
+tensor(6)
+done!
+10
+tensor(3)
+tensor(10)
+tensor(2)
+tensor(1)
+tensor(15)
+tensor(0)
+tensor(9)
+tensor(8)
+done!
+11
+tensor(1)
+tensor(0)
+tensor(2)
+tensor(4)
+tensor(7)
+tensor(3)
+tensor(11)
+done!
+12
+tensor(1)
+tensor(2)
+tensor(0)
+tensor(5)
+tensor(11)
+tensor(4)
+done!
+13
+tensor(8)
+tensor(2)
+tensor(1)
+tensor(3)
+tensor(0)
+tensor(9)
+tensor(5)
+done!
+14
+tensor(5)
+tensor(0)
+tensor(1)
+tensor(4)
+tensor(3)
+tensor(2)
+tensor(7)
+tensor(8)
+done!
+15
+tensor(5)
+tensor(15)
+tensor(1)
+tensor(0)
+tensor(12)
+tensor(2)
+done!
+16
+tensor(3)
+tensor(0)
+tensor(5)
+tensor(1)
+tensor(2)
+tensor(4)
+tensor(10)
+done!
+17
+tensor(13)
+tensor(2)
+tensor(6)
+tensor(8)
+tensor(5)
+tensor(0)
+tensor(14)
+tensor(1)
+done!
+18
+tensor(1)
+tensor(2)
+tensor(12)
+tensor(3)
+tensor(0)
+tensor(8)
+tensor(5)
+done!
+19
+tensor(6)
+tensor(0)
+tensor(14)
+tensor(2)
+tensor(1)
+tensor(3)
+tensor(12)
+done!
+20
+tensor(6)
+tensor(1)
+tensor(3)
+tensor(0)
+tensor(5)
+tensor(7)
+done!
+21
+tensor(1)
+tensor(12)
+tensor(0)
+tensor(7)
+tensor(13)
+tensor(15)
+tensor(3)
+done!
+22
+tensor(7)
+tensor(10)
+tensor(4)
+tensor(2)
+tensor(15)
+tensor(0)
+tensor(8)
+tensor(3)
+done!
+23
+tensor(8)
+tensor(2)
+tensor(3)
+tensor(4)
+tensor(0)
+tensor(13)
+tensor(6)
+tensor(7)
+done!
+24
+tensor(1)
+tensor(2)
+tensor(13)
+tensor(0)
+tensor(11)
+tensor(9)
+done!
+25
+tensor(13)
+tensor(0)
+tensor(2)
+tensor(9)
+tensor(5)
+tensor(3)
+tensor(1)
+tensor(6)
+done!
+26
+tensor(9)
+tensor(2)
+tensor(0)
+tensor(14)
+tensor(4)
+tensor(15)
+done!
+27
+tensor(0)
+tensor(2)
+tensor(12)
+tensor(1)
+tensor(6)
+tensor(15)
+tensor(3)
+done!
+28
+tensor(8)
+tensor(7)
+tensor(1)
+tensor(5)
+tensor(3)
+tensor(0)
+tensor(13)
+tensor(14)
+done!
+29
+tensor(4)
+tensor(0)
+tensor(1)
+tensor(7)
+tensor(6)
+tensor(3)
+tensor(2)
+tensor(13)
+done!
+30
+tensor(2)
+tensor(1)
+tensor(12)
+tensor(4)
+tensor(11)
+tensor(0)
+tensor(5)
+done!
+31
+tensor(5)
+tensor(0)
+tensor(3)
+tensor(9)
+tensor(6)
+tensor(1)
+tensor(12)
+tensor(7)
+done!
+all done!
+Model size: 37.4187 GB
+  0%|                                                                                            | 0/20 [00:00<?, ?it/s]100%|███████████████████████████████████████████████████████████████████████████████| 20/20 [00:00<00:00, 165130.08it/s]
+2025-01-13:00:14:16,699 INFO     [evaluator.py:496] Running generate_until requests
+Running generate_until requests:   0%|                                                           | 0/20 [00:00<?, ?it/s]Running generate_until requests:   5%|██▌                                               | 1/20 [01:41<32:01, 101.14s/it]Running generate_until requests:  10%|█████                                              | 2/20 [03:18<29:38, 98.83s/it]Running generate_until requests:  15%|███████▋                                           | 3/20 [04:57<28:04, 99.09s/it]Running generate_until requests:  20%|██████████▏                                        | 4/20 [05:12<17:33, 65.83s/it]Running generate_until requests:  25%|████████████▊                                      | 5/20 [06:51<19:24, 77.64s/it]Running generate_until requests:  30%|███████████████▎                                   | 6/20 [08:31<19:52, 85.20s/it]Running generate_until requests:  35%|█████████████████▊                                 | 7/20 [10:17<19:56, 92.04s/it]Running generate_until requests:  40%|████████████████████▍                              | 8/20 [12:03<19:17, 96.47s/it]Running generate_until requests:  45%|██████████████████████▉                            | 9/20 [13:48<18:12, 99.36s/it]Running generate_until requests:  50%|████████████████████████▌                        | 10/20 [15:33<16:50, 101.07s/it]Running generate_until requests:  55%|██████████████████████████▉                      | 11/20 [17:19<15:21, 102.37s/it]Running generate_until requests:  60%|█████████████████████████████▍                   | 12/20 [19:03<13:44, 103.09s/it]Running generate_until requests:  65%|███████████████████████████████▊                 | 13/20 [20:49<12:07, 104.00s/it]Running generate_until requests:  70%|██████████████████████████████████▎              | 14/20 [22:35<10:26, 104.44s/it]Running generate_until requests:  75%|████████████████████████████████████▊            | 15/20 [24:22<08:46, 105.21s/it]Running generate_until requests:  80%|███████████████████████████████████████▏         | 16/20 [26:08<07:01, 105.43s/it]Running generate_until requests:  85%|█████████████████████████████████████████▋       | 17/20 [27:52<05:15, 105.05s/it]Running generate_until requests:  90%|████████████████████████████████████████████     | 18/20 [29:37<03:30, 105.16s/it]Running generate_until requests:  95%|██████████████████████████████████████████████▌  | 19/20 [31:22<01:45, 105.09s/it]Running generate_until requests: 100%|█████████████████████████████████████████████████| 20/20 [33:09<00:00, 105.46s/it]Running generate_until requests: 100%|██████████████████████████████████████████████████| 20/20 [33:09<00:00, 99.46s/it]
+{'squad_completion': {'alias': 'squad_completion', 'contains,none': 0.0, 'contains_stderr,none': 'N/A'}}

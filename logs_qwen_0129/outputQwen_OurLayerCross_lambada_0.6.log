@@ -1,0 +1,39 @@
+2025-02-01:04:49:23,431 INFO     [huggingface.py:132] Using device 'cpu'
+2025-02-01:04:49:23,731 INFO     [huggingface.py:369] Model parallel was set to False, max memory was not set, and device map was set to {'': 'cpu'}
+Loading checkpoint shards:   0%|                                                                                                                                 | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|███████████████▏                                                                                                         | 1/8 [00:00<00:01,  4.85it/s]Loading checkpoint shards:  25%|██████████████████████████████▎                                                                                          | 2/8 [00:00<00:01,  5.36it/s]Loading checkpoint shards:  38%|█████████████████████████████████████████████▍                                                                           | 3/8 [00:00<00:00,  5.47it/s]Loading checkpoint shards:  50%|████████████████████████████████████████████████████████████▌                                                            | 4/8 [00:00<00:00,  5.50it/s]Loading checkpoint shards:  62%|███████████████████████████████████████████████████████████████████████████▋                                             | 5/8 [00:00<00:00,  5.37it/s]Loading checkpoint shards:  75%|██████████████████████████████████████████████████████████████████████████████████████████▊                              | 6/8 [00:01<00:00,  5.27it/s]Loading checkpoint shards:  88%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▉               | 7/8 [00:01<00:00,  5.18it/s]Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  5.96it/s]Loading checkpoint shards: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  5.55it/s]
+2025-02-01:04:49:32,215 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
+2025-02-01:04:49:32,216 INFO     [evaluator.py:217] Using pre-initialized model
+Using the latest cached version of the dataset since lambada couldn't be found on the Hugging Face Hub
+2025-02-01:04:49:53,591 WARNING  [load.py:1600] Using the latest cached version of the dataset since lambada couldn't be found on the Hugging Face Hub
+all_gate number:24
+Traceback (most recent call last):
+  File "/root/autodl-tmp/lm-evaluation-harness/Qwen_expert_merge_our_layerCross.py", line 551, in <module>
+    results = lm_eval.simple_evaluate( # call simple_evaluate squad_completion
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
+    return fn(*args, **kwargs)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 235, in simple_evaluate
+    task_dict = get_task_dict(tasks, task_manager)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 618, in get_task_dict
+    task_name_from_string_dict = task_manager.load_task_or_group(
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 414, in load_task_or_group
+    collections.ChainMap(*map(self._load_individual_task_or_group, task_list))
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 332, in _load_individual_task_or_group
+    collections.ChainMap(*map(fn, reversed(subtask_list)))
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 314, in _load_individual_task_or_group
+    return _load_task(task_config, task=name_or_config)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 280, in _load_task
+    task_object = ConfigurableTask(config=config)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/api/task.py", line 819, in __init__
+    self.download(self.config.dataset_kwargs)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/api/task.py", line 926, in download
+    self.dataset = datasets.load_dataset(
+  File "/root/miniconda3/lib/python3.10/site-packages/datasets/load.py", line 2556, in load_dataset
+    builder_instance = load_dataset_builder(
+  File "/root/miniconda3/lib/python3.10/site-packages/datasets/load.py", line 2265, in load_dataset_builder
+    builder_instance: DatasetBuilder = builder_cls(
+  File "/root/miniconda3/lib/python3.10/site-packages/datasets/packaged_modules/cache/cache.py", line 122, in __init__
+    config_name, version, hash = _find_hash_in_cache(
+  File "/root/miniconda3/lib/python3.10/site-packages/datasets/packaged_modules/cache/cache.py", line 48, in _find_hash_in_cache
+    raise ValueError(
+ValueError: Couldn't find cache for lambada for config 'default'
+Available configs in the cache: ['plain_text']

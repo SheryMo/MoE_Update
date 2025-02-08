@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# # 定义 dataset 列表 "sciq" "tinyTruthfulQA"
+# datasets=("winogrande" )
+
+# # 遍历每个 dataset 和 percent
+# for dataset in "${datasets[@]}"; do
+#     # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_full.py --dataset "$dataset" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Full_"$dataset".log 2>&1
+#   for percent in $(seq 0.6 0.1 0.9); do
+#     echo "Running: python script.py --dataset $dataset --percent $percent"
+#     # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_our_layerCross.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_OurLayerCross_"$dataset"_"$percent".log 2>&1
+#     # python Qwen_expert_merge_outSim.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Sim_"$dataset"_"$percent".log 2>&1
+#     HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_our.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Our_"$dataset"_"$percent".log 2>&1
+#     # python Qwen_expert_merge_random.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Random_"$dataset"_"$percent".log 2>&1
+#   done
+#   for percent in $(seq 0.1 0.1 0.9); do
+#     # python Qwen_expert_merge_our.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Our_"$dataset"_"$percent".log 2>&1
+#     python Qwen_expert_merge_random.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Random_"$dataset"_"$percent".log 2>&1
+#   done
+# done
+
+# datasetss=( "lambada")
+# # 遍历每个 dataset 和 percent
+# for dataset in "${datasetss[@]}"; do
+#     # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_full.py --dataset "$dataset" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Full_"$dataset".log 2>&1
+#   for percent in $(seq 0.1 0.1 0.1); do
+#     echo "Running: python script.py --dataset $dataset --percent $percent 1"
+#     HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_our_layerCross.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_OurLayerCross_"$dataset"_"$percent".log 2>&1
+#   done
+#   for percent in $(seq 0.1 0.1 0.9); do
+#     echo "Running: python script.py --dataset $dataset --percent $percent"
+#     HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_outSim.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Sim_"$dataset"_"$percent".log 2>&1
+#     HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_our.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Our_"$dataset"_"$percent".log 2>&1
+#     HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_random.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Random_"$dataset"_"$percent".log 2>&1
+#   done
+# done "winogrande"
+
+datasetss=( "sciq" "lambada")
+# 遍历每个 dataset 和 percent
+for dataset in "${datasetss[@]}"; do
+    # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_full.py --dataset "$dataset" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Full_"$dataset".log 2>&1
+  for percent in $(seq 0.1 0.1 0.9); do
+    echo "Running: python script.py --dataset $dataset --percent $percent"
+    # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_outSim.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Sim_"$dataset"_"$percent".log 2>&1
+    HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_our.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Our_"$dataset"_"$percent"_fixed.log 2>&1
+    # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_random.py --dataset "$dataset" --percent "$percent" > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Random_"$dataset"_"$percent".log 2>&1
+  done
+done
