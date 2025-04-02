@@ -554,7 +554,6 @@ results = lm_eval.simple_evaluate( # call simple_evaluate squad_completion
     num_fewshot=0,
     task_manager=task_manager,
     batch_size = 1,
-    limit = 2000,
 )
 print('full model:')
 print(results['results'])

@@ -1,0 +1,78 @@
+2025-03-08:21:20:25,790 INFO     [huggingface.py:132] Using device 'cpu'
+2025-03-08:21:20:26,150 INFO     [huggingface.py:369] Model parallel was set to False, max memory was not set, and device map was set to {'': 'cpu'}
+Loading checkpoint shards:   0%|                                                                                                                                                   | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█████████████████▍                                                                                                                         | 1/8 [00:00<00:01,  3.90it/s]Loading checkpoint shards:  25%|██████████████████████████████████▊                                                                                                        | 2/8 [00:00<00:01,  4.25it/s]Loading checkpoint shards:  38%|████████████████████████████████████████████████████▏                                                                                      | 3/8 [00:00<00:01,  4.32it/s]Loading checkpoint shards:  50%|█████████████████████████████████████████████████████████████████████▌                                                                     | 4/8 [00:00<00:00,  4.30it/s]Loading checkpoint shards:  62%|██████████████████████████████████████████████████████████████████████████████████████▉                                                    | 5/8 [00:01<00:00,  4.24it/s]Loading checkpoint shards:  75%|████████████████████████████████████████████████████████████████████████████████████████████████████████▎                                  | 6/8 [00:01<00:00,  4.16it/s]Loading checkpoint shards:  88%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                 | 7/8 [00:01<00:00,  4.06it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.69it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.37it/s]
+2025-03-08:21:20:37,094 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
+2025-03-08:21:20:37,094 INFO     [evaluator.py:217] Using pre-initialized model
+2025-03-08:21:20:37,098 WARNING  [task.py:800] [Task: wikitext] metric word_perplexity is defined, but aggregation is not. using default aggregation=weighted_perplexity
+2025-03-08:21:20:37,098 WARNING  [task.py:812] [Task: wikitext] metric word_perplexity is defined, but higher_is_better is not. using default higher_is_better=False
+2025-03-08:21:20:37,098 WARNING  [task.py:800] [Task: wikitext] metric byte_perplexity is defined, but aggregation is not. using default aggregation=weighted_perplexity
+2025-03-08:21:20:37,098 WARNING  [task.py:812] [Task: wikitext] metric byte_perplexity is defined, but higher_is_better is not. using default higher_is_better=False
+2025-03-08:21:20:37,098 WARNING  [task.py:800] [Task: wikitext] metric bits_per_byte is defined, but aggregation is not. using default aggregation=bits_per_byte
+2025-03-08:21:20:37,098 WARNING  [task.py:812] [Task: wikitext] metric bits_per_byte is defined, but higher_is_better is not. using default higher_is_better=False
+2025-03-08:21:20:50,933 WARNING  [evaluator.py:270] Overwriting default num_fewshot of wikitext from None to 0
+2025-03-08:21:20:50,935 INFO     [task.py:415] Building contexts for wikitext on rank 0...
+all_gate number:24
+  0%|                                                                                                                                                                             | 0/62 [00:00<?, ?it/s] 65%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▏                                                         | 40/62 [00:00<00:00, 383.53it/s]100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 62/62 [00:00<00:00, 439.72it/s]
+2025-03-08:21:20:51,081 INFO     [evaluator.py:496] Running loglikelihood_rolling requests
+  0%|                                                                                                                                                                             | 0/62 [00:00<?, ?it/s] 11%|██████████████████▋                                                                                                                                                  | 7/62 [00:00<00:00, 55.34it/s] 23%|█████████████████████████████████████                                                                                                                               | 14/62 [00:00<00:00, 60.80it/s] 37%|████████████████████████████████████████████████████████████▊                                                                                                       | 23/62 [00:00<00:00, 72.87it/s] 50%|██████████████████████████████████████████████████████████████████████████████████                                                                                  | 31/62 [00:00<00:00, 65.09it/s] 61%|████████████████████████████████████████████████████████████████████████████████████████████████████▌                                                               | 38/62 [00:00<00:00, 55.89it/s] 71%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▍                                               | 44/62 [00:00<00:00, 53.47it/s] 92%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▊             | 57/62 [00:00<00:00, 70.96it/s]100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 62/62 [00:00<00:00, 66.01it/s]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:24<00:00, 24.44s/it]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:24<00:00, 24.44s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [01:22<00:00, 82.21s/it]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [01:22<00:00, 82.21s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:43<00:00, 43.92s/it]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:43<00:00, 43.92s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [02:14<00:00, 134.48s/it]Running loglikelihood requests: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [02:14<00:00, 134.48s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [02:14<00:00, 134.13s/it]Running loglikelihood requests: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [02:14<00:00, 134.13s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:38<00:00, 38.37s/it]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:38<00:00, 38.37s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:43<00:00, 43.85s/it]Running loglikelihood requests: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1/1 [00:43<00:00, 43.85s/it]
+Running loglikelihood requests:   0%|                                                                                                                                              | 0/1 [00:00<?, ?it/s]Traceback (most recent call last):
+  File "/root/autodl-tmp/lm-evaluation-harness/Qwen_expert_merge_only_layerCross.py", line 551, in <module>
+    results = lm_eval.simple_evaluate( # call simple_evaluate squad_completion
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
+    return fn(*args, **kwargs)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 303, in simple_evaluate
+    results = evaluate(
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
+    return fn(*args, **kwargs)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 507, in evaluate
+    resps = getattr(lm, reqtype)(cloned_reqs)
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/models/huggingface.py", line 967, in loglikelihood_rolling
+    batch_nlls = self._loglikelihood_tokens(
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/models/huggingface.py", line 1179, in _loglikelihood_tokens
+    self._model_call(batched_inps, **call_kwargs), dim=-1
+  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/models/huggingface.py", line 862, in _model_call
+    return self.model(inps).logits
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 1307, in forward
+    outputs = self.model(
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 1013, in forward
+    layer_outputs = decoder_layer(
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 741, in forward
+    hidden_states = self.mlp(hidden_states)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 650, in forward
+    current_hidden_states = expert_layer(current_state) * routing_weights[top_x, idx, None]
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 276, in forward
+    return self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 114, in forward
+    return F.linear(input, self.weight, self.bias)
+KeyboardInterrupt

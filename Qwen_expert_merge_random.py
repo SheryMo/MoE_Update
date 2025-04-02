@@ -313,7 +313,7 @@ task_manager = lm_eval.tasks.TaskManager()
     
 # )
 
-model = HFLM(pretrained="/root/autodl-tmp/lm-evaluation-harness/Qwen/Qwen1.5-MoE-A2.7B", trust_remote_code=True, device="cpu")
+model = HFLM(pretrained="/root/autodl-tmp/lm-evaluation-harness/Qwen/Qwen1.5-MoE-A2.7B", trust_remote_code=True,device='cpu')
 numm = 0
 for name, layer in model._model.named_modules():
     if 'mlp.gate' in name:
@@ -340,8 +340,10 @@ print(captured_outputs)
 # print(captured_expert_output)
 frequency_list = map_to_range(captured_outputs)
 expert_output = map_to_range(captured_expert_output)
-model._model = merge_by_groups_with_usage_frequency_weighting(model._model, frequency_list, expert_output)
-model_size = get_model_size(model._model)
+modell = merge_by_groups_with_usage_frequency_weighting(model._model, frequency_list, expert_output)
+modell = modell.cuda()
+model = HFLM(pretrained=modell, trust_remote_code=True, device="cuda")
+model_size = get_model_size(modell)
 print(f"Model size: {model_size:.4f} GB")
 # print("begin to save!")
 # # modell.save_pretrained('/root/autodl-tmp/lm-evaluation-harness/HiphiMergedMoE')
@@ -358,7 +360,7 @@ results = lm_eval.simple_evaluate( # call simple_evaluate multirc
     num_fewshot=0,
     task_manager=task_manager,
     batch_size = 1,
-    limit = 2000,
+    limit = 10000,
 )
 # print(captured_outputs)
 # print(captured_one)
