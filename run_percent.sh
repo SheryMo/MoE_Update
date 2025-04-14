@@ -95,5 +95,7 @@ for dataset in "${datasetss[@]}"; do
   done
 
 done
-# HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_full.py --dataset "copa" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Full_"copa".log 2>&1 
+# HF_ENDPOINT=https://hf-mirror.com python A_expert_merge_our_layerCross.py --dataset "copa" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_Google_0413/outputQwen_layerCross_"copa".log 2>&1 
 # HF_ENDPOINT=https://hf-mirror.com python Qwen_expert_merge_full.py --dataset "logiqa" --percent 0.5 > /root/autodl-tmp/lm-evaluation-harness/logs_qwen_0129/outputQwen_Full_"logiqa".log 2>&1 
+
+# HF_ENDPOINT=https://hf-mirror.com python A_expert_merge_our_layerCross.py --dataset "winogrande" --percent 0.6 > /root/autodl-tmp/lm-evaluation-harness/logs_Google_0413/outputswitch_layerCross_wino_0.5.log 2>&1
