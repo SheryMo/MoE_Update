@@ -15,7 +15,11 @@ import numpy as np
 from tqdm import tqdm
 from typing import Optional, List
 import random
-
+import lm_eval
+import numpy as np
+import math
+import argparse
+from sklearn.metrics.pairwise import cosine_similarity
 def extract_task_groups(log_file_path = 'logs11.log'):
     task_groups = []  # 存放任务组的列表
     start_line = False  # 标记是否已经找到目标行
@@ -104,3 +108,42 @@ def compute_similarity_between_layers(layer_variance_1, layer_variance_2):
         np.array(layer_variance_2).reshape(1, -1)
     )[0][0]
     return cos_sim
+
+def map_to_range(data,name, new_min=0.1, new_max=0.9):
+    if name == []:
+        # 定义函数，将每个小列表映射到[0.1, 0.9]区间
+        result = []
+        names = []
+        for gate, values in data.items():
+            old_min = min(values)
+            old_max = max(values)
+            # 遍历每个值进行归一化
+            normalized_values = [
+                0 if math.isnan(value) else value
+                for value in values
+            ]
+            result.append(normalized_values)
+            names.append(gate)
+    else:
+        result = [[] for ii in name]
+        names = name
+        for namem in names:
+            vales = data[namem]
+            old_min = min(values)
+            old_max = max(values)
+            # 遍历每个值进行归一化
+            normalized_values = [
+                0 if math.isnan(value) else value
+                for value in values
+            ]
+            result.append(normalized_values)
+    
+    return result,names
+
+def get_model_size(model):
+    total_size = 0
+    for param in model.parameters():
+        total_size += param.nelement() * param.element_size()
+    # Convert bytes to megabytes (MB)
+    total_size_mb = total_size / (1024 ** 3)
+    return total_size_mb
