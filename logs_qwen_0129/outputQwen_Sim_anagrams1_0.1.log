@@ -1,67 +1,0 @@
-2025-03-04:20:48:19,770 INFO     [huggingface.py:132] Using device 'cpu'
-2025-03-04:20:48:20,127 INFO     [huggingface.py:369] Model parallel was set to False, max memory was not set, and device map was set to {'': 'cpu'}
-Loading checkpoint shards:   0%|                                                                                                                                                   | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█████████████████▍                                                                                                                         | 1/8 [00:00<00:01,  4.88it/s]Loading checkpoint shards:  25%|██████████████████████████████████▊                                                                                                        | 2/8 [00:00<00:01,  4.74it/s]Loading checkpoint shards:  38%|████████████████████████████████████████████████████▏                                                                                      | 3/8 [00:00<00:01,  4.61it/s]Loading checkpoint shards:  50%|█████████████████████████████████████████████████████████████████████▌                                                                     | 4/8 [00:00<00:00,  4.51it/s]Loading checkpoint shards:  62%|██████████████████████████████████████████████████████████████████████████████████████▉                                                    | 5/8 [00:01<00:00,  4.39it/s]Loading checkpoint shards:  75%|████████████████████████████████████████████████████████████████████████████████████████████████████████▎                                  | 6/8 [00:01<00:00,  4.23it/s]Loading checkpoint shards:  88%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                 | 7/8 [00:01<00:00,  4.09it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.72it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.52it/s]
-2025-03-04:20:48:30,791 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
-2025-03-04:20:48:30,792 INFO     [evaluator.py:217] Using pre-initialized model
-all_gate number:24
-Downloading data:   0%|                                                                                                                                                       | 0.00/107k [00:00<?, ?B/s]Downloading data:  31%|███████████████████████████████████████████▉                                                                                                   | 32.8k/107k [00:00<00:00, 102kB/s]
-Traceback (most recent call last):
-  File "/root/autodl-tmp/lm-evaluation-harness/Qwen_expert_merge_outSim.py", line 374, in <module>
-    results = lm_eval.simple_evaluate( # call simple_evaluate
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
-    return fn(*args, **kwargs)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 235, in simple_evaluate
-    task_dict = get_task_dict(tasks, task_manager)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 618, in get_task_dict
-    task_name_from_string_dict = task_manager.load_task_or_group(
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 414, in load_task_or_group
-    collections.ChainMap(*map(self._load_individual_task_or_group, task_list))
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 314, in _load_individual_task_or_group
-    return _load_task(task_config, task=name_or_config)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/tasks/__init__.py", line 280, in _load_task
-    task_object = ConfigurableTask(config=config)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/api/task.py", line 819, in __init__
-    self.download(self.config.dataset_kwargs)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/api/task.py", line 926, in download
-    self.dataset = datasets.load_dataset(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/load.py", line 2582, in load_dataset
-    builder_instance.download_and_prepare(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/builder.py", line 1005, in download_and_prepare
-    self._download_and_prepare(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/builder.py", line 1767, in _download_and_prepare
-    super()._download_and_prepare(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/builder.py", line 1078, in _download_and_prepare
-    split_generators = self._split_generators(dl_manager, **split_generators_kwargs)
-  File "/root/autodl-tmp/huggingface/modules/datasets_modules/datasets/EleutherAI--unscramble/85faa44127c557bb866ba66533953aae49266ace10a6092794ef0cfa01a6971e/unscramble.py", line 90, in _split_generators
-    data_dir = dl_manager.download_and_extract(urls)
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/download/download_manager.py", line 570, in download_and_extract
-    return self.extract(self.download(url_or_urls))
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/download/download_manager.py", line 434, in download
-    downloaded_path_or_paths = map_nested(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/utils/py_utils.py", line 457, in map_nested
-    return function(data_struct)
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/download/download_manager.py", line 459, in _download
-    out = cached_path(url_or_filename, download_config=download_config)
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/utils/file_utils.py", line 190, in cached_path
-    output_path = get_from_cache(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/utils/file_utils.py", line 634, in get_from_cache
-    http_get(
-  File "/root/miniconda3/lib/python3.10/site-packages/datasets/utils/file_utils.py", line 409, in http_get
-    for chunk in response.iter_content(chunk_size=1024):
-  File "/root/miniconda3/lib/python3.10/site-packages/requests/models.py", line 816, in generate
-    yield from self.raw.stream(chunk_size, decode_content=True)
-  File "/root/miniconda3/lib/python3.10/site-packages/urllib3/response.py", line 628, in stream
-    data = self.read(amt=amt, decode_content=decode_content)
-  File "/root/miniconda3/lib/python3.10/site-packages/urllib3/response.py", line 567, in read
-    data = self._fp_read(amt) if not fp_closed else b""
-  File "/root/miniconda3/lib/python3.10/site-packages/urllib3/response.py", line 533, in _fp_read
-    return self._fp.read(amt) if amt is not None else self._fp.read()
-  File "/root/miniconda3/lib/python3.10/http/client.py", line 465, in read
-    s = self.fp.read(amt)
-  File "/root/miniconda3/lib/python3.10/socket.py", line 705, in readinto
-    return self._sock.recv_into(b)
-  File "/root/miniconda3/lib/python3.10/ssl.py", line 1274, in recv_into
-    return self.read(nbytes, buffer)
-  File "/root/miniconda3/lib/python3.10/ssl.py", line 1130, in read
-    return self._sslobj.read(len, buffer)
-KeyboardInterrupt

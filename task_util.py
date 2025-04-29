@@ -147,3 +147,15 @@ def get_model_size(model):
     # Convert bytes to megabytes (MB)
     total_size_mb = total_size / (1024 ** 3)
     return total_size_mb
+
+def wait_for_port(ip, port, timeout=30.0):
+    """等待某个IP+端口开放"""
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.settimeout(1)  # 1秒超时
+            result = sock.connect_ex((ip, port))
+            if result == 0:  # 端口开放
+                return True
+        time.sleep(0.5)  # 等待半秒重试
+    return False

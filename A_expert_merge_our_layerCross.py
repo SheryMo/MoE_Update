@@ -621,7 +621,7 @@ task_manager = lm_eval.tasks.TaskManager()
     
 # )
 
-model = HFLM(pretrained="/root/autodl-tmp/lm-evaluation-harness/google/switch-base-32", trust_remote_code=True,device = 'cuda')
+model = HFLM(pretrained="/root/autodl-fs/switch-base-32", trust_remote_code=True,device = 'cuda:0')
 numm = 0
 # print(model._model)
 for name, layer in model._model.named_modules():
@@ -653,7 +653,7 @@ expert_output,names_out = map_to_range(captured_expert_output,[])
 print(names_fre)
 modell = merge_by_groups_with_usage_frequency_weighting(model._model, frequency_list, expert_output,names_fre)
 modell = modell.cuda()
-model = HFLM(pretrained=modell, trust_remote_code=True, device="cuda")
+model = HFLM(pretrained=modell, trust_remote_code=True, device="cuda:0")
 model_size = get_model_size(modell)
 print(f"Model size: {model_size:.4f} GB")
 # print("begin to save!")

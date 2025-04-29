@@ -29,11 +29,11 @@ parser.add_argument('--percent', type=float, default="0.5", help="merge parts is
 
 # 解析命令行参数
 args = parser.parse_args()
-
+args.percent = 0.5  # Set the 'percent' argument manually
 ############################################################################
 # Node类：定义节点行为
 class Node:
-    def __init__(self, ip, args, task, neighbors=None, upload_folder='uploads', info_table_path='node_info.json'):
+    def __init__(self, ip, args, task, neighbors=None, upload_folder='uploads', info_table_path='node_info.json', gpu_id=None):
         self.ip = ip  # 本地节点的IP地址
         self.args = args
         self.diff = 0.6  # 差异阈值
@@ -44,6 +44,10 @@ class Node:
         self.node_info = {}  # 存储收到的邻居节点信息
         self.upload_folder = "uploads"  # 文件存储目录
         os.makedirs(self.upload_folder, exist_ok=True)  # 创建文件存储目录
+
+        self.gpu_id = gpu_id  # 分配的 GPU ID
+        self.device = f"cuda:{self.gpu_id}" if self.gpu_id is not None else "cpu"
+
         self.init_task = task
         self.task_group = None
         self.task_dict = None
@@ -61,18 +65,114 @@ class Node:
         self.update_ava = False
         self.update_solution = None
         self.model_fre = None
-        self.name_to_layer_para = ['encoder.block.1.layer.1.mlp',
-'encoder.block.3.layer.1.mlp',
-'encoder.block.5.layer.1.mlp',
-'encoder.block.7.layer.1.mlp',
-'encoder.block.9.layer.1.mlp',
-'encoder.block.11.layer.1.mlp',
-'decoder.block.1.layer.2.mlp',
-'decoder.block.3.layer.2.mlp',
-'decoder.block.5.layer.2.mlp',
-'decoder.block.7.layer.2.mlp',
-'decoder.block.9.layer.2.mlp',
-'decoder.block.11.layer.2.mlp'] # 用于存储每一层expert的名字
+        self.name_to_layer_para = [
+            'encoder.block.1.layer.1.mlp',
+            'encoder.block.3.layer.1.mlp',
+            'encoder.block.5.layer.1.mlp',
+            'encoder.block.7.layer.1.mlp',
+            'encoder.block.9.layer.1.mlp',
+            'encoder.block.11.layer.1.mlp',
+            'decoder.block.1.layer.2.mlp',
+            'decoder.block.3.layer.2.mlp',
+            'decoder.block.5.layer.2.mlp',
+            'decoder.block.7.layer.2.mlp',
+            'decoder.block.9.layer.2.mlp',
+            'decoder.block.11.layer.2.mlp'] # 用于存储每一层expert的名字
+        self.expanded_task_list = [
+            'AraDiCE_ArabicMMLU_high_humanities_history_egy',
+            'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
+            'AraDiCE_piqa_egy',
+            'AraDiCE_ArabicMMLU_high_stem_biology_egy',
+            'arc_easy',
+            'arc_challenge',
+            'anagrams1',
+            'anli_r2',
+            'anli_r1',
+            'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
+            'coqa',
+            'eq_bench',
+            'fda',
+            'cola',
+            'mnli',
+            'mrpc',
+            'qnli',
+            'qqp',
+            'rte',
+            'sst',
+            'wnli',
+            'gpqa_main_zeroshot',
+            'gpqa_diamond_zeroshot',
+            'gpqa_extended_zeroshot',
+            'gpqa_main_n_shot',
+            'gpqa_diamond_n_shot',
+            'gpqa_extended_n_shot',
+            'gpqa_main_generative_n_shot',
+            'gpqa_diamond_generative_n_shot',
+            'gpqa_extended_generative_n_shot',
+            'gpqa_main_cot_zeroshot',
+            'gpqa_diamond_cot_zeroshot',
+            'gpqa_extended_cot_zeroshot',
+            'gpqa_main_cot_n_shot',
+            'gpqa_diamond_cot_n_shot',
+            'gpqa_extended_cot_n_shot',
+            'lambada_openai',
+            'lambada_standard',
+            'leaderboard_bbh_boolean_expressions',
+            'leaderboard_bbh_causal_judgement',
+            'leaderboard_bbh_date_understanding',
+            'leaderboard_bbh_disambiguation_qa',
+            'leaderboard_bbh_formal_fallacies',
+            'leaderboard_bbh_geometric_shapes',
+            'leaderboard_bbh_hyperbaton',
+            'leaderboard_bbh_logical_deduction_five_objects',
+            'leaderboard_bbh_logical_deduction_seven_objects',
+            'leaderboard_bbh_logical_deduction_three_objects',
+            'leaderboard_bbh_movie_recommendation',
+            'leaderboard_bbh_navigate',
+            'leaderboard_bbh_object_counting',
+            'leaderboard_bbh_penguins_in_a_table',
+            'leaderboard_bbh_reasoning_about_colored_objects',
+            'leaderboard_bbh_ruin_names',
+            'leaderboard_bbh_salient_translation_error_detection',
+            'leaderboard_bbh_snarks',
+            'leaderboard_bbh_sports_understanding',
+            'leaderboard_bbh_temporal_sequences',
+            'leaderboard_bbh_tracking_shuffled_objects_five_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_three_objects',
+            'leaderboard_bbh_web_of_lies',
+            'logiqa',
+            'mmlu',
+            'mmlu_stem',
+            'mmlu_humanities',
+            'mmlu_other',
+            'mmlu_pro',
+            'mmlu_social_sciences',
+            'openbookqa',
+            'piqa',
+            'sciq',
+            'boolq',
+            'cb',
+            'copa',
+            'multirc',
+            'record',
+            'rte',
+            'wic',
+            'wsc',
+            'super_glue-boolq-t5-prompt',
+            'super_glue-cb-t5-prompt',
+            'super_glue-copa-t5-prompt',
+            'super_glue-multirc-t5-prompt',
+            'super_glue-record-t5-prompt',
+            'super_glue-rte-t5-prompt',
+            'super_glue-wic-t5-prompt',
+            'super_glue-wsc-t5-prompt',
+            'truthfulqa_mc1',
+            'truthfulqa_mc2',
+            'truthfulqa_gen',
+            'winogrande',
+            'wikitext'
+            ]
 
 
         self.upload_folder = upload_folder  # 文件上传目录
@@ -88,14 +188,11 @@ class Node:
         self.app = Flask(__name__)
         self._initialize_routes()
         
+        self.port = 5000 + int(self.ip.split('.')[-1])
+        
         # 初始化捕获的专家输出
         self.captured_expert_output = {}
         self.layer_expert_count = 0
-        
-        self.initialize_model()
-
-        self.start_flask_server()
-        self.start_inference_thread()
 
     
     def _initialize_routes(self):
@@ -263,17 +360,22 @@ class Node:
         
     def initialize_model(self):
         """初始化模型，任务组，任务字典，tokenizer"""
-        # 提取任务组和任务字典
-        self.task_group = extract_task_groups('/root/autodl-tmp/lm-evaluation-harness/logs11.log')
-        self.task_dict = extract_task_dict('/root/autodl-tmp/lm-evaluation-harness/logs11.log', self.task_group)
+        # # 提取任务组和任务字典
+        # self.task_group = extract_task_groups('/root/mo-e_-merge_and_-update_-mec/logs11.log')
+        # self.task_dict = extract_task_dict('/root/mo-e_-merge_and_-update_-mec/logs11.log', self.task_group)
 
         # 加载tokenizer
         self.tokenizer = AutoTokenizer.from_pretrained("google/switch-base-32", trust_remote_code=True)
         self.task_manager = lm_eval.tasks.TaskManager()
+        print(self.ip)
+        print(self.device)
+        print(self.init_task)
 
+        
         # 加载模型
-        self.model = HFLM(pretrained="/root/autodl-tmp/lm-evaluation-harness/google/switch-base-32", 
-                          trust_remote_code=True, device='cuda')
+        self.model = HFLM(pretrained="google/switch-base-32", 
+                          trust_remote_code=True ,device=self.device)
+        # self.model._model = self.model._model.to_empty(self.device)
 
         # 注册forward hook
         self.hook_handles = []
@@ -285,24 +387,34 @@ class Node:
             task_manager=self.task_manager,
             batch_size = 1,
             limit = 100,
+            device = self.device,
         )
         print('full model:')
         print(results['results'])
-        print(self.captured_outputs)
+        # print(self.captured_outputs)
         frequency_list,names_fre = map_to_range(self.captured_outputs,[])
         self.model_fre = frequency_list
         expert_output,names_out = map_to_range(self.captured_expert_output,[])
         modell = self.merge_by_groups_with_usage_frequency_weighting(self.model._model, frequency_list, expert_output,names_fre)
-        modell = modell.cuda()
-        self.local_model = HFLM(pretrained=modell, trust_remote_code=True, device="cuda")
+        modell = modell.to(self.device)
+        self.local_model = HFLM(pretrained=modell, trust_remote_code=True,  device=self.device)
         model_size = get_model_size(modell)
         print(f"Model size: {model_size:.4f} GB")
+        
+        # self.start_flask_server()
+        # self.start_inference_thread()
 
+    def start_all_services(self):
+        """统一启动 Flask 服务器和推理线程"""
+        self.start_flask_server()
+        self.start_inference_thread()
+        
     def register_hooks(self,model):
+        numm = 0
         """注册模型的forward hook"""
         for name, layer in model._model.named_modules():
             if 'mlp.router.classifier' in name:
-                print(name)
+                # print(name)
                 layer.register_forward_hook(self.hook_fn)
                 numm += 1
                 # print(name,layer)
@@ -608,7 +720,12 @@ class Node:
     
             # 获取当前层组别的唯一值，并将group中的所有元素转换为整数
             group_tensor = group_dict[layer_idx]
+            print(group_tensor)
+            
+            group_tensor = torch.tensor(group_tensor)  # Convert list to tensor
             group_tensor = group_tensor.int()  # 将所有元素转换为整数
+            print(group_tensor)
+            
             unique_groups = group_tensor.unique().tolist()
     
             # 创建一个字典，用于存储每个组的结果
@@ -617,10 +734,14 @@ class Node:
             if -2 not in group_tensor:  # 如果当前层的group不包含-2
                 # 遍历所有组别
                 for group in unique_groups:
-                    # 获取该组对应的expert索引
+                    # Ensure group_indices is always a list, even if it's a single index
                     group_indices = (group_tensor == group).nonzero(as_tuple=False).squeeze().tolist()
-    
-                    # 计算该组内的频率权重
+                    
+                    # If group_indices is a single integer, convert it to a list
+                    if isinstance(group_indices, int):
+                        group_indices = [group_indices]  # Convert integer to list
+                    
+                    # Now, safely use the list comprehension
                     group_weights = [frequencies[idx] if idx in group_indices else 0 for idx in range(len(frequencies))]
 
                     # 计算该组的带权加和
@@ -654,7 +775,7 @@ class Node:
                 
                 while current_layer < num_layers and -2 in group_dict[current_layer]:
                     group_tensor = group_dict[current_layer]
-                    group_weights = usage_frequency_dict[names[current_layer]]
+                    group_weights = usage_frequency_dict[current_layer]
                     merged_group_indices.extend(group_tensor)
                     merged_frequencies.extend(group_weights)
     
@@ -704,7 +825,7 @@ class Node:
         """
         num_layers = len(frequency_list)
         num_experts = len(frequency_list[0])  # 每层有60个专家
-        print(num_experts)
+        # print(num_experts)
         group = [[-1 for _ in range(num_experts)] for _ in range(num_layers)]  # 初始化组标签
         limit = num_experts  # 组的最大数量
         # 遍历每一层
@@ -797,8 +918,8 @@ class Node:
         group = self.assign_experts_to_groups_by_similarity(frequency_list, expert_output)
         group = self.adjust_groups_based_on_variance_similarity(frequency_list, group)
         self.X = self.get_updated_experts(frequency_list,group,self.num_layer,names)
-        print(group)
-        print("1")
+        # print(group)
+        # print("1")
         num_layers = len(frequency_list)
         layer_idx = 1
         while layer_idx < num_layers:
@@ -883,7 +1004,7 @@ class Node:
         model_save_path = f'{self.ip}.pt'  # 保存文件的路径
         torch.save(expert_weights, model_save_path)
         return model_save_path
-    
+        
     def download_files_from_all_nodes(self):
         """从所有节点下载文件"""
         # 读取当前的节点信息表
@@ -897,10 +1018,8 @@ class Node:
             if model_path:
                 # 尝试从该节点的 Flask 服务器下载文件
                 try:
-                    # 假设 Flask 服务器在 5000 端口，并且 download 路由用于下载文件
-                    url = f'http://{ip}:5000/download/{os.path.basename(model_path)}'
-
-                    # 发起 GET 请求下载文件
+                    neighbor_port = 5000 + int(ip.split('.')[-1])
+                    url = f'http://{ip}:{neighbor_port}/download/{os.path.basename(model_path)}'
                     response = requests.get(url)
 
                     # 检查响应是否成功
@@ -963,7 +1082,7 @@ class Node:
     def upload_model(self):
         """将模型文件上传到当前节点"""
         model_save_path = self.save_model()  # 保存模型并获取文件路径
-        url = f"http://{self.ip}:5000/upload"  # Flask接口的URL
+        url = f"http://{self.ip}:{self.port}/upload"  # 用自己的端口
         self.model_save = model_save_path
         # 打开保存的模型文件并上传
         with open(model_save_path, 'rb') as f:
@@ -987,7 +1106,8 @@ class Node:
             'model_path':self.model_save,
         }
         for neighbor in self.neighbors:
-            neighbor_url = f"http://{neighbor.ip}:5000/receive_info"
+            neighbor_port = 5000 + int(neighbor.ip.split('.')[-1])
+            neighbor_url = f"http://{neighbor.ip}:{neighbor_port}/receive_info"
             response = requests.post(neighbor_url, json=packet)
             if response.status_code == 200:
                 print(f"Node info sent to {neighbor.ip}")
@@ -999,12 +1119,13 @@ class Node:
         """将接收到的信息转发到邻居"""
         for neighbor in self.neighbors:
             if neighbor.ip != data['ip']:
-                neighbor_url = f"http://{neighbor.ip}:5000/receive_info"
+                neighbor_port = 5000 + int(neighbor.ip.split('.')[-1])
+                neighbor_url = f"http://{neighbor.ip}:{neighbor_port}/receive_info"
                 response = requests.post(neighbor_url, json=data)
                 if response.status_code == 200:
-                    print(f"Node info sent to {neighbor.ip}")
+                    print(f"Node info forwarded to {neighbor.ip}")
                 else:
-                    print(f"Failed to send node info to {neighbor.ip}")
+                    print(f"Failed to forward node info to {neighbor.ip}")
 
     def should_update(self, model_fre, frequency_list):
         """
@@ -1028,18 +1149,18 @@ class Node:
         """模拟模型推理并触发更新操作"""
         # 模拟推理过程
         print(f"Node {self.ip} performing model inference...")
-        pree = min(pree + random.random() * 0.2, 1)
-        # 20% 的概率选择一个 group
-        if random.random() < pree:
-            # 从 task_group 中随机选择一个 group
-            selected_group = random.choice(self.task_group)
-            print(f"Selected group: {selected_group}")
-            # captured_outputs = {}
-            group_ini = selected_group
-            pree = 0.1
+        # pree = min(pree + random.random() * 0.2, 1)
+        # # 20% 的概率选择一个 group
+        # if random.random() < pree:
+        #     # 从 task_group 中随机选择一个 group
+        #     selected_group = random.choice(self.task_group)
+        #     print(f"Selected group: {selected_group}")
+        #     # captured_outputs = {}
+        #     group_ini = selected_group
+        #     pree = 0.1
     
         # 从 selected_group 中随机选择一个 task
-        tasks = self.task_dict.get(group_ini, [])
+        tasks = self.expanded_task_list
         if tasks:
             self.start_time = None
             # 选择一个任务
@@ -1056,6 +1177,7 @@ class Node:
                 task_manager=self.task_manager,
                 batch_size = 1,
                 limit = 500,
+                device = self.device,
             )
             print(f'Before Update in time {datetime.now()}: {results['results']}')
             
@@ -1082,8 +1204,10 @@ class Node:
                 task_manager=self.task_manager,
                 batch_size = 1,
                 limit = 5000,
+                device = self.device,
             )
             print(f'After Update in time {datetime.now()}: {results['results']}')
+            
         # 设置定时任务，每隔一定时间触发更新操作
         threading.Timer(10, self.model_inference_and_update).start()
 
@@ -1158,9 +1282,12 @@ class Node:
         self.start_time = datetime.now()
 ####################################
     def start_flask_server(self):
-        """启动Flask服务器"""
-        print(f"Node {self.ip} Flask server is running...")
-        self.app.run(host='0.0.0.0', port=5000)  # 可以根据需要修改端口
+        """启动Flask服务器（非阻塞线程 + 动态端口）"""
+        print(f"Node {self.ip} Flask server is running on port {self.port}...")
+        threading.Thread(
+            target=lambda: self.app.run(host='0.0.0.0', port=self.port, threaded=True, use_reloader=False),
+            daemon=True
+        ).start()
 
     def start_inference_thread(self):
         """启动模型推理的线程"""
@@ -1170,4 +1297,239 @@ class Node:
         """停止Flask服务器"""
         func = self.app.get_send_file_max_age_func()
         func()
+
+
+def build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path='node_info.json', num_gpus=6):
+    # 随机生成唯一的IP地址
+    def generate_unique_ip(existing_ips):
+        while True:
+            ip = f"192.168.1.{random.randint(1, 255)}"
+            if ip not in existing_ips:
+                existing_ips.add(ip)
+                return ip
+
+    # 提取任务组和任务字典
+    task_group = expanded_task_list
+    # print(task_group)
+    # print(task_dict)
+    # 创建所有节点
+    nodes = []
+    ip_list = []
+    existing_ips = set()
+
+    # 使用轮循的方式分配 GPU
+    gpu_id_list = list(range(num_gpus)) * (num_nodes // num_gpus) + list(range(num_nodes % num_gpus))  # 轮流分配 GPU
+
+    # 存储已经分配的任务，确保任务不重复
+    assigned_tasks = set()
+
+    for _ in range(num_nodes):
+        ip = generate_unique_ip(existing_ips)
+        ip_list.append(ip)
+
+    # 为每个节点随机选择邻居
+    node_neighbors = {}
+    for ip in ip_list:
+        neighbors = random.sample([x for x in ip_list if x != ip], neighbors_count)
+        node_neighbors[ip] = neighbors
+
+    # 确保邻居关系是双向的
+    for ip, neighbors in node_neighbors.items():
+        for neighbor in neighbors:
+            if ip not in node_neighbors[neighbor]:
+                node_neighbors[neighbor].append(ip)
+
+    # 保存每个节点的网络架构到独立文件
+    for ip, neighbors in node_neighbors.items():
+        # 每个节点对应一个独立的文件，确保文件名唯一
+        network_info_path = f"network_info/{ip}_network_info.json"
+        network_info = {ip: neighbors}
+        
+        with open(network_info_path, 'w') as f:
+            json.dump(network_info, f)
+            
+    # 随机抽取 num_nodes 个任务
+    if len(expanded_task_list) < num_nodes:
+        raise ValueError("expanded_task_list长度不足，无法为所有节点分配唯一任务")
+
+    selected_tasks = random.sample(expanded_task_list, num_nodes)
+    
+    # 创建节点实例，分配 GPU 和任务
+    nodes = []
+    for idx, (ip, neighbors) in enumerate(node_neighbors.items()):
+        gpu_id = gpu_id_list[idx]
+        selected_task = selected_tasks[idx]
+
+        node = Node(
+            ip=ip,
+            args=args,
+            task=selected_task,
+            neighbors=neighbors,
+            info_table_path=f"network_info/{ip}_info.json",
+            gpu_id=gpu_id
+        )
+        nodes.append(node)
+
+    return nodes, node_neighbors
+
+def initialize_model_in_parallel(nodes):
+    """
+    以并行的方式初始化节点的模型，确保每组内部只有一个节点在同一时间进行初始化。
+    """
+    # 线程锁，用于确保每组内只有一个节点在同一时间进行初始化
+    group_locks = {group_id: threading.Lock() for group_id in range(6)}
+
+    def initialize_node(node):
+        with group_locks[node.gpu_id]:  # 确保同一组内节点是顺序进行初始化
+            node.initialize_model()
+
+    # 使用多线程并行初始化节点
+    threads = []
+    for node in nodes:
+        thread = threading.Thread(target=initialize_node, args=(node,))
+        threads.append(thread)
+        thread.start()
+
+    # 等待所有线程完成初始化
+    for thread in threads:
+        thread.join()
+        
+def initialize_model_sequentially(nodes):
+    """
+    顺序初始化模型，统一并发启动 Flask，并确认上线后，再统一启动推理。
+    """
+    # 【1】阶段1：顺序初始化模型
+    for node in nodes:
+        node.initialize_model()
+
+    # 【2】阶段2：启动所有节点的 Flask Server（并行启动）
+    threads = []
+    for node in nodes:
+        thread = threading.Thread(target=node.start_flask_server)
+        thread.start()
+        threads.append(thread)
+
+    # 等待所有 Flask server 确实启动
+    for node in nodes:
+        if not wait_for_port(node.ip, node.port):
+            raise TimeoutError(f"Flask server at {node.ip}:{node.port} did not start in time!")
+    print("All Flask servers are ready.")
+
+    # 【3】阶段3：统一启动推理线程
+    inference_threads = []
+    for node in nodes:
+        thread = threading.Thread(target=node.start_inference_thread)
+        thread.start()
+        inference_threads.append(thread)
+
+    print("All inference threads started.")
+
+# 示例使用
+num_nodes = 32
+neighbors_count = 3
+base_info_path = 'node_info.json'
+expanded_task_list = [
+            'AraDiCE_ArabicMMLU_high_humanities_history_egy',
+            'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
+            'AraDiCE_piqa_egy',
+            'AraDiCE_ArabicMMLU_high_stem_biology_egy',
+            'arc_easy',
+            'arc_challenge',
+            'anagrams1',
+            'anli_r2',
+            'anli_r1',
+            'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
+            'coqa',
+            'eq_bench',
+            'fda',
+            'cola',
+            'mnli',
+            'mrpc',
+            'qnli',
+            'qqp',
+            'rte',
+            'sst',
+            'wnli',
+            'gpqa_main_zeroshot',
+            'gpqa_diamond_zeroshot',
+            'gpqa_extended_zeroshot',
+            'gpqa_main_n_shot',
+            'gpqa_diamond_n_shot',
+            'gpqa_extended_n_shot',
+            'gpqa_main_generative_n_shot',
+            'gpqa_diamond_generative_n_shot',
+            'gpqa_extended_generative_n_shot',
+            'gpqa_main_cot_zeroshot',
+            'gpqa_diamond_cot_zeroshot',
+            'gpqa_extended_cot_zeroshot',
+            'gpqa_main_cot_n_shot',
+            'gpqa_diamond_cot_n_shot',
+            'gpqa_extended_cot_n_shot',
+            'lambada_openai',
+            'lambada_standard',
+            'leaderboard_bbh_boolean_expressions',
+            'leaderboard_bbh_causal_judgement',
+            'leaderboard_bbh_date_understanding',
+            'leaderboard_bbh_disambiguation_qa',
+            'leaderboard_bbh_formal_fallacies',
+            'leaderboard_bbh_geometric_shapes',
+            'leaderboard_bbh_hyperbaton',
+            'leaderboard_bbh_logical_deduction_five_objects',
+            'leaderboard_bbh_logical_deduction_seven_objects',
+            'leaderboard_bbh_logical_deduction_three_objects',
+            'leaderboard_bbh_movie_recommendation',
+            'leaderboard_bbh_navigate',
+            'leaderboard_bbh_object_counting',
+            'leaderboard_bbh_penguins_in_a_table',
+            'leaderboard_bbh_reasoning_about_colored_objects',
+            'leaderboard_bbh_ruin_names',
+            'leaderboard_bbh_salient_translation_error_detection',
+            'leaderboard_bbh_snarks',
+            'leaderboard_bbh_sports_understanding',
+            'leaderboard_bbh_temporal_sequences',
+            'leaderboard_bbh_tracking_shuffled_objects_five_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_three_objects',
+            'leaderboard_bbh_web_of_lies',
+            'logiqa',
+            'mmlu',
+            'mmlu_stem',
+            'mmlu_humanities',
+            'mmlu_other',
+            'mmlu_pro',
+            'mmlu_social_sciences',
+            'openbookqa',
+            'piqa',
+            'sciq',
+            'boolq',
+            'cb',
+            'copa',
+            'multirc',
+            'record',
+            'rte',
+            'wic',
+            'wsc',
+            'super_glue-boolq-t5-prompt',
+            'super_glue-cb-t5-prompt',
+            'super_glue-copa-t5-prompt',
+            'super_glue-multirc-t5-prompt',
+            'super_glue-record-t5-prompt',
+            'super_glue-rte-t5-prompt',
+            'super_glue-wic-t5-prompt',
+            'super_glue-wsc-t5-prompt',
+            'truthfulqa_mc1',
+            'truthfulqa_mc2',
+            'truthfulqa_gen',
+            'winogrande',
+            'wikitext'
+            ]
+nodes, network_info = build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path)
+print(f"网络架构：{network_info}")
+
+# 启动节点初始化
+initialize_model_sequentially(nodes)
+
+# # 启动推理
+# for node in nodes:
+#     node.start_inference()
 

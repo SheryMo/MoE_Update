@@ -1,73 +1,0 @@
-2025-03-08:21:31:16,347 INFO     [huggingface.py:132] Using device 'cpu'
-2025-03-08:21:31:16,699 INFO     [huggingface.py:369] Model parallel was set to False, max memory was not set, and device map was set to {'': 'cpu'}
-Loading checkpoint shards:   0%|                                                                                                                                                   | 0/8 [00:00<?, ?it/s]Loading checkpoint shards:  12%|█████████████████▍                                                                                                                         | 1/8 [00:00<00:01,  3.77it/s]Loading checkpoint shards:  25%|██████████████████████████████████▊                                                                                                        | 2/8 [00:00<00:01,  4.14it/s]Loading checkpoint shards:  38%|████████████████████████████████████████████████████▏                                                                                      | 3/8 [00:00<00:01,  4.19it/s]Loading checkpoint shards:  50%|█████████████████████████████████████████████████████████████████████▌                                                                     | 4/8 [00:00<00:00,  4.19it/s]Loading checkpoint shards:  62%|██████████████████████████████████████████████████████████████████████████████████████▉                                                    | 5/8 [00:01<00:00,  4.23it/s]Loading checkpoint shards:  75%|████████████████████████████████████████████████████████████████████████████████████████████████████████▎                                  | 6/8 [00:01<00:00,  4.20it/s]Loading checkpoint shards:  88%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████▋                 | 7/8 [00:01<00:00,  4.11it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.75it/s]Loading checkpoint shards: 100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 8/8 [00:01<00:00,  4.37it/s]
-2025-03-08:21:31:27,285 INFO     [evaluator.py:164] Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
-2025-03-08:21:31:27,285 INFO     [evaluator.py:217] Using pre-initialized model
-all_gate number:24
-Downloading readme: 0.00B [00:00, ?B/s]Downloading readme: 7.17kB [00:00, 59.8kB/s]Downloading readme: 8.92kB [00:00, 72.6kB/s]
-Downloading data:   0%|                                                                                                                                                      | 0.00/16.4M [00:00<?, ?B/s]Downloading data:  64%|██████████████████████████████████████████████████████████████████████████████████████████▎                                                  | 10.5M/16.4M [00:03<00:02, 2.67MB/s]Downloading data: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 16.4M/16.4M [00:04<00:00, 4.26MB/s]Downloading data: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 16.4M/16.4M [00:04<00:00, 3.81MB/s]
-Downloading data:   0%|                                                                                                                                                      | 0.00/1.35M [00:00<?, ?B/s]Downloading data: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1.35M/1.35M [00:01<00:00, 1.25MB/s]Downloading data: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1.35M/1.35M [00:01<00:00, 1.24MB/s]
-Generating train split:   0%|                                                                                                                                          | 0/130319 [00:00<?, ? examples/s]Generating train split:  22%|███████████████████████████▏                                                                                              | 29000/130319 [00:00<00:00, 286311.40 examples/s]Generating train split:  45%|███████████████████████████████████████████████████████▏                                                                  | 59000/130319 [00:00<00:00, 287124.78 examples/s]Generating train split:  70%|█████████████████████████████████████████████████████████████████████████████████████▏                                    | 91000/130319 [00:00<00:00, 298900.68 examples/s]Generating train split:  94%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████▏      | 123000/130319 [00:00<00:00, 302511.24 examples/s]Generating train split: 100%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 130319/130319 [00:00<00:00, 297086.95 examples/s]
-Generating validation split:   0%|                                                                                                                                      | 0/11873 [00:00<?, ? examples/s]Generating validation split: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 11873/11873 [00:00<00:00, 301000.16 examples/s]
-2025-03-08:21:32:07,589 WARNING  [evaluator.py:270] Overwriting default num_fewshot of squadv2 from None to 0
-2025-03-08:21:32:07,590 INFO     [task.py:415] Building contexts for squadv2 on rank 0...
-  0%|                                                                                                                                                                          | 0/11873 [00:00<?, ?it/s] 74%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████                                        | 8833/11873 [00:00<00:00, 88323.98it/s]100%|███████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 11873/11873 [00:00<00:00, 85594.51it/s]
-2025-03-08:21:32:08,569 INFO     [evaluator.py:496] Running generate_until requests
-Running generate_until requests:   0%|                                                                                                                                         | 0/11873 [00:00<?, ?it/s]Running generate_until requests:   0%|                                                                                                                             | 1/11873 [01:20<265:30:43, 80.51s/it]Running generate_until requests:   0%|                                                                                                                             | 2/11873 [02:24<233:25:47, 70.79s/it]Running generate_until requests:   0%|                                                                                                                             | 3/11873 [03:28<222:58:47, 67.63s/it]Running generate_until requests:   0%|                                                                                                                             | 4/11873 [04:26<211:12:50, 64.06s/it]Running generate_until requests:   0%|                                                                                                                             | 5/11873 [05:26<205:29:50, 62.33s/it]Running generate_until requests:   0%|                                                                                                                             | 6/11873 [06:21<197:49:12, 60.01s/it]Running generate_until requests:   0%|                                                                                                                             | 7/11873 [07:11<187:17:43, 56.82s/it]Running generate_until requests:   0%|                                                                                                                             | 8/11873 [08:15<193:52:30, 58.82s/it]Running generate_until requests:   0%|                                                                                                                             | 9/11873 [09:12<192:11:40, 58.32s/it]Traceback (most recent call last):
-  File "/root/autodl-tmp/lm-evaluation-harness/Qwen_expert_merge_full.py", line 551, in <module>
-    results = lm_eval.simple_evaluate( # call simple_evaluate squad_completion
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
-    return fn(*args, **kwargs)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 303, in simple_evaluate
-    results = evaluate(
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/utils.py", line 402, in _wrapper
-    return fn(*args, **kwargs)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/evaluator.py", line 507, in evaluate
-    resps = getattr(lm, reqtype)(cloned_reqs)
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/models/huggingface.py", line 1339, in generate_until
-    cont = self._model_generate(
-  File "/root/autodl-tmp/lm-evaluation-harness/lm_eval/models/huggingface.py", line 882, in _model_generate
-    return self.model.generate(
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/utils/_contextlib.py", line 115, in decorate_context
-    return func(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/generation/utils.py", line 2255, in generate
-    result = self._sample(
-  File "/root/autodl-tmp/transformers/src/transformers/generation/utils.py", line 3254, in _sample
-    outputs = self(**model_inputs, return_dict=True)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 1307, in forward
-    outputs = self.model(
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 1013, in forward
-    layer_outputs = decoder_layer(
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 741, in forward
-    hidden_states = self.mlp(hidden_states)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 650, in forward
-    current_hidden_states = expert_layer(current_state) * routing_weights[top_x, idx, None]
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/autodl-tmp/transformers/src/transformers/models/qwen2_moe/modeling_qwen2_moe.py", line 276, in forward
-    return self.down_proj(self.act_fn(self.gate_proj(x)) * self.up_proj(x))
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
-    return self._call_impl(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
-    return forward_call(*args, **kwargs)
-  File "/root/miniconda3/lib/python3.10/site-packages/torch/nn/modules/linear.py", line 114, in forward
-    return F.linear(input, self.weight, self.bias)
-KeyboardInterrupt
