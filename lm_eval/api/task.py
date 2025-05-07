@@ -992,6 +992,7 @@ class ConfigurableTask(Task):
                 path=self.DATASET_PATH,
                 name=self.DATASET_NAME,
                 **dataset_kwargs if dataset_kwargs is not None else {},
+                # trust_remote_code=True, 
             )
 
     def has_training_docs(self) -> bool:

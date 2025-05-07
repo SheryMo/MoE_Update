@@ -20,6 +20,63 @@ import numpy as np
 import math
 import argparse
 from sklearn.metrics.pairwise import cosine_similarity
+import copy
+import gc
+import torch
+import inspect
+import socket
+import logging
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+def clean_and_report_cuda_tensors(context_label="未命名"):
+    print(f"\n===== 🚀【CUDA 检查开始】[{context_label}] =====")
+    
+    # 强制垃圾回收
+    gc.collect()
+    torch.cuda.empty_cache()
+
+    # 记录当前仍在 CUDA 的 Tensor
+    cuda_tensors = []
+    total_size_mb = 0
+
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                if obj.is_cuda:
+                    size_mb = obj.element_size() * obj.nelement() / 1024**2
+                    total_size_mb += size_mb
+                    cuda_tensors.append((type(obj), tuple(obj.size()), size_mb))
+
+        except Exception:
+            continue
+
+    if cuda_tensors:
+        print(f"🔍 找到 {len(cuda_tensors)} 个仍驻留在 CUDA 上的张量:")
+        for obj_type, shape, size in cuda_tensors:
+            print(f"  - 类型: {obj_type.__name__:<20} | 尺寸: {shape} | 显存: {size:.2f} MB")
+    else:
+        print("✅ 没有发现任何驻留在 CUDA 上的张量，显存清理成功。")
+
+    print(f"🧠 总占用 CUDA 显存（非缓存）: {total_size_mb:.2f} MB")
+    print(f"===== ✅【CUDA 检查结束】[{context_label}] =====\n")
+    
+def list_tensors_on_cuda():
+    print("="*50)
+    print("🔍 当前仍驻留在 CUDA 上的张量信息：")
+    total_mem = 0
+    for obj in gc.get_objects():
+        try:
+            if torch.is_tensor(obj) or (hasattr(obj, 'data') and torch.is_tensor(obj.data)):
+                if obj.is_cuda:
+                    size = obj.element_size() * obj.nelement() / 1024**2  # MB
+                    total_mem += size
+                    print(f"- 类型: {type(obj)}, 大小: {obj.size()}, 占用显存: {size:.2f} MB")
+        except Exception as e:
+            pass
+    print(f"\n🧠 总共占用 CUDA 显存（非缓存部分）: {total_mem:.2f} MB")
+    print("="*50)
+
 def extract_task_groups(log_file_path = 'logs11.log'):
     task_groups = []  # 存放任务组的列表
     start_line = False  # 标记是否已经找到目标行
@@ -148,14 +205,45 @@ def get_model_size(model):
     total_size_mb = total_size / (1024 ** 3)
     return total_size_mb
 
-def wait_for_port(ip, port, timeout=30.0):
-    """等待某个IP+端口开放"""
+def wait_for_port(ip, port, timeout=30.0, logger=logger):
+    """
+    Wait for a specific IP and port to become available (open for TCP connection).
+
+    Args:
+        ip (str): The IP address to check.
+        port (int): The port to check.
+        timeout (float): Max time to wait (in seconds).
+        logger (logging.Logger, optional): Optional logger for debug output.
+
+    Returns:
+        bool: True if port is open before timeout, False otherwise.
+    """
     start_time = time.time()
     while time.time() - start_time < timeout:
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.settimeout(1)  # 1秒超时
-            result = sock.connect_ex((ip, port))
-            if result == 0:  # 端口开放
-                return True
-        time.sleep(0.5)  # 等待半秒重试
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                sock.settimeout(1.0)  # 1 second timeout
+                result = sock.connect_ex((ip, port))
+                if result == 0:
+                    if logger:
+                        logger.debug(f"Port {port} at {ip} is open.")
+                    return True
+                else:
+                    if logger:
+                        logger.debug(f"Port {port} at {ip} not open yet (code {result}).")
+        except Exception as e:
+            if logger:
+                logger.warning(f"Error checking port {port} at {ip}: {e}")
+        time.sleep(0.5)
+
+    if logger:
+        logger.warning(f"Timeout waiting for port {port} at {ip}.")
     return False
+    
+def safe_model_clone(model):
+    # 保存当前模型的 state_dict
+    state_dict = copy.deepcopy(model.state_dict())  # deepcopy here is OK
+    # 新建同结构模型
+    new_model = type(model)(model.config)
+    new_model.load_state_dict(state_dict)
+    return new_model
