@@ -105,84 +105,84 @@ class Node:
             'anli_r1',
             'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
             'coqa',
-            # 'eq_bench',
-            # 'fda',
-            # 'cola',
-            # 'mnli',
-            # 'mrpc',
-            # 'qnli',
-            # 'qqp',
-            # 'rte',
-            # # 'sst',
-            # 'wnli',
-            # 'gpqa_main_zeroshot',
-            # 'gpqa_diamond_zeroshot',
-            # 'gpqa_extended_zeroshot',
-            # 'gpqa_main_n_shot',
-            # 'gpqa_diamond_n_shot',
-            # 'gpqa_extended_n_shot',
-            # 'gpqa_main_generative_n_shot',
-            # 'gpqa_diamond_generative_n_shot',
-            # 'gpqa_extended_generative_n_shot',
-            # 'gpqa_main_cot_zeroshot',
-            # 'gpqa_diamond_cot_zeroshot',
-            # 'gpqa_extended_cot_zeroshot',
-            # 'gpqa_main_cot_n_shot',
-            # 'gpqa_diamond_cot_n_shot',
-            # 'gpqa_extended_cot_n_shot',
-            # 'lambada_openai',
-            # 'lambada_standard',
-            # 'leaderboard_bbh_causal_judgement',
-            # 'leaderboard_bbh_disambiguation_qa',
-            # 'leaderboard_bbh_hyperbaton',
-            # 'leaderboard_bbh_logical_deduction_five_objects',
-            # 'leaderboard_bbh_navigate',
-            # 'leaderboard_bbh_object_counting',
-            # 'leaderboard_bbh_reasoning_about_colored_objects',
-            # 'leaderboard_bbh_ruin_names',
-            # 'leaderboard_bbh_salient_translation_error_detection',
-            # 'leaderboard_bbh_sports_understanding',
-            # 'leaderboard_bbh_temporal_sequences',
-            # 'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
-            # 'leaderboard_bbh_tracking_shuffled_objects_three_objects',
-            # 'leaderboard_bbh_web_of_lies', 
-            # 'mastermind_24_easy',
-            # 'mastermind_24_hard',
-            # 'mastermind_35_easy',
-            # 'mastermind_35_hard',
-            # 'mastermind_46_easy',
-            # 'mastermind_46_hard',
-            # 'logiqa',
-            # # 'mmlu',
-            # 'mmlu_stem',
-            # 'mmlu_humanities',
-            # 'mmlu_other',
-            # 'mmlu_pro',
-            # 'mmlu_social_sciences',
-            # 'openbookqa',
-            # 'piqa',
-            # 'sciq',
-            # 'boolq',
-            # 'cb',
-            # 'copa',
-            # 'multirc',
-            # 'record',
-            # 'rte',
-            # 'wic',
-            # 'wsc',
-            # 'super_glue-boolq-t5-prompt',
-            # 'super_glue-cb-t5-prompt',
-            # 'super_glue-copa-t5-prompt',
-            # 'super_glue-multirc-t5-prompt',
-            # 'super_glue-record-t5-prompt',
-            # 'super_glue-rte-t5-prompt',
-            # 'super_glue-wic-t5-prompt',
-            # 'super_glue-wsc-t5-prompt',
-            # 'truthfulqa_mc1',
-            # 'truthfulqa_mc2',
-            # 'truthfulqa_gen',
-            # 'winogrande',
-            # 'wikitext'
+            'eq_bench',
+            'fda',
+            'cola',
+            'mnli',
+            'mrpc',
+            'qnli',
+            'qqp',
+            'rte',
+            # 'sst',
+            'wnli',
+            'gpqa_main_zeroshot',
+            'gpqa_diamond_zeroshot',
+            'gpqa_extended_zeroshot',
+            'gpqa_main_n_shot',
+            'gpqa_diamond_n_shot',
+            'gpqa_extended_n_shot',
+            'gpqa_main_generative_n_shot',
+            'gpqa_diamond_generative_n_shot',
+            'gpqa_extended_generative_n_shot',
+            'gpqa_main_cot_zeroshot',
+            'gpqa_diamond_cot_zeroshot',
+            'gpqa_extended_cot_zeroshot',
+            'gpqa_main_cot_n_shot',
+            'gpqa_diamond_cot_n_shot',
+            'gpqa_extended_cot_n_shot',
+            'lambada_openai',
+            'lambada_standard',
+            'leaderboard_bbh_causal_judgement',
+            'leaderboard_bbh_disambiguation_qa',
+            'leaderboard_bbh_hyperbaton',
+            'leaderboard_bbh_logical_deduction_five_objects',
+            'leaderboard_bbh_navigate',
+            'leaderboard_bbh_object_counting',
+            'leaderboard_bbh_reasoning_about_colored_objects',
+            'leaderboard_bbh_ruin_names',
+            'leaderboard_bbh_salient_translation_error_detection',
+            'leaderboard_bbh_sports_understanding',
+            'leaderboard_bbh_temporal_sequences',
+            'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_three_objects',
+            'leaderboard_bbh_web_of_lies', 
+            'mastermind_24_easy',
+            'mastermind_24_hard',
+            'mastermind_35_easy',
+            'mastermind_35_hard',
+            'mastermind_46_easy',
+            'mastermind_46_hard',
+            'logiqa',
+            # 'mmlu',
+            'mmlu_stem',
+            'mmlu_humanities',
+            'mmlu_other',
+            'mmlu_pro',
+            'mmlu_social_sciences',
+            'openbookqa',
+            'piqa',
+            'sciq',
+            'boolq',
+            'cb',
+            'copa',
+            'multirc',
+            'record',
+            'rte',
+            'wic',
+            'wsc',
+            'super_glue-boolq-t5-prompt',
+            'super_glue-cb-t5-prompt',
+            'super_glue-copa-t5-prompt',
+            'super_glue-multirc-t5-prompt',
+            'super_glue-record-t5-prompt',
+            'super_glue-rte-t5-prompt',
+            'super_glue-wic-t5-prompt',
+            'super_glue-wsc-t5-prompt',
+            'truthfulqa_mc1',
+            'truthfulqa_mc2',
+            'truthfulqa_gen',
+            'winogrande',
+            'wikitext'
             ]
 
 
@@ -1469,23 +1469,23 @@ class Node:
                 num_fewshot=0,
                 task_manager=self.task_manager,
                 batch_size = 1,
-                limit = 100,#500 TODO
+                limit = 300,#500 TODO
                 device = self.device,
             )
             print(f'Before Update in time {datetime.now()}: {results['results']}')
             
             frequency_list,names_fre = map_to_range(self.captured_outputs,[])
             expert_output,names_out = map_to_range(self.captured_expert_output,[])
-            # if np.linalg.norm(np.array(self.model_fre) - np.array(frequency_list)) > self.diff:TODO
-            self.being_update = True
-            self.being_Information = True
-            group = self.assign_experts_to_groups_by_similarity(frequency_list, expert_output)
-            group = self.adjust_groups_based_on_variance_similarity(frequency_list, group)
-            print("This is the group like")
-            print(group)
-            self.Y = self.get_updated_experts(frequency_list,group,self.num_layer,names_fre)
-            print("This is Y looks like:")
-            print(self.Y)
+            if np.linalg.norm(np.array(self.model_fre) - np.array(frequency_list)) > self.diff:
+                self.being_update = True
+                self.being_Information = True
+                group = self.assign_experts_to_groups_by_similarity(frequency_list, expert_output)
+                group = self.adjust_groups_based_on_variance_similarity(frequency_list, group)
+                # print("This is the group like")
+                # print(group)
+                self.Y = self.get_updated_experts(frequency_list,group,self.num_layer,names_fre)
+                # print("This is Y looks like:")
+                # print(self.Y)
                 # self.adjust_groups_based_on_variance_similarity(frequency_list, group)
                 
             # 模拟更新过程：上传模型文件和发送节点信息
@@ -1501,7 +1501,7 @@ class Node:
                 num_fewshot=0,
                 task_manager=self.task_manager,
                 batch_size = 1,
-                limit = 100,#500 TODO
+                limit = 300,#500 TODO
                 device = self.device,
             )
             print(f'After Update in time {datetime.now()}: {results['results']}')
@@ -1514,12 +1514,12 @@ class Node:
         while self.being_Information and delta_time.total_seconds() < 180:
             time.sleep(1)
             delta_time = datetime.now() - self.start_time
-        # # 处理接收到的信息 - 没有解TODO
-        # if self.being_Information:
-        #     # 没得到更新
-        #     print(f"Node {self.ip} cannot get the solution.")
-        #     self.being_update = False
-        #     return 
+        # 处理接收到的信息 - 没有解TODO
+        if self.being_Information:
+            # 没得到更新
+            print(f"Node {self.ip} cannot get the solution.")
+            self.being_update = False
+            return 
         # 处理接收到的信息 - 有解 - 开始更新
         print(f"Node {self.ip} got the solution.")
         combined_weights_wi,combined_weights_wo = self.combine_all_weights()
@@ -1720,17 +1720,17 @@ def build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info
         with open(network_info_path, 'w') as f:
             json.dump(network_info, f)
             
-    # # 随机抽取 num_nodes 个任务TODO
-    # if len(expanded_task_list) < num_nodes:
-    #     raise ValueError("expanded_task_list长度不足，无法为所有节点分配唯一任务")
+    # 随机抽取 num_nodes 个任务TODO
+    if len(expanded_task_list) < num_nodes:
+        raise ValueError("expanded_task_list长度不足，无法为所有节点分配唯一任务")
 
-    # selected_tasks = random.sample(expanded_task_list, num_nodes)TODO
+    selected_tasks = random.sample(expanded_task_list, num_nodes)
     
     # 创建节点实例，分配 GPU 和任务
     nodes = []
     for idx, (ip, neighbors) in enumerate(node_neighbors.items()):
         gpu_id = gpu_id_list[idx]
-        selected_task = expanded_task_list[0] #TODO: selected_tasks[idx]
+        selected_task = selected_tasks[idx] #TODO: selected_tasks[idx]expanded_task_list[0]
 
         node = Node(
             ip=ip,
@@ -1797,99 +1797,99 @@ def initialize_model_sequentially(nodes):
     print("All inference threads started.")
 
 # 示例使用
-num_nodes = 10
-neighbors_count = 3
+num_nodes = 32
+neighbors_count = 4
 base_info_path = 'node_info.json'
 expanded_task_list = [
             'AraDiCE_ArabicMMLU_high_humanities_history_egy',
-            # 'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
-            # 'AraDiCE_piqa_egy',
-            # 'AraDiCE_ArabicMMLU_high_stem_biology_egy',
-            # 'arc_easy',
-            # 'arc_challenge',
-            # 'anagrams1',
-            # 'anli_r2',
-            # 'anli_r1',
-            # 'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
-            # 'coqa',
-            # 'eq_bench',
-            # 'fda',
-            # 'cola',
-            # 'mnli',
-            # 'mrpc',
-            # 'qnli',
-            # 'qqp',
-            # 'rte',
-            # # 'sst',
-            # 'wnli',
-            # 'gpqa_main_zeroshot',
-            # 'gpqa_diamond_zeroshot',
-            # 'gpqa_extended_zeroshot',
-            # 'gpqa_main_n_shot',
-            # 'gpqa_diamond_n_shot',
-            # 'gpqa_extended_n_shot',
-            # 'gpqa_main_generative_n_shot',
-            # 'gpqa_diamond_generative_n_shot',
-            # 'gpqa_extended_generative_n_shot',
-            # 'gpqa_main_cot_zeroshot',
-            # 'gpqa_diamond_cot_zeroshot',
-            # 'gpqa_extended_cot_zeroshot',
-            # 'gpqa_main_cot_n_shot',
-            # 'gpqa_diamond_cot_n_shot',
-            # 'gpqa_extended_cot_n_shot',
-            # 'lambada_openai',
-            # 'lambada_standard',
-            # 'leaderboard_bbh_causal_judgement',
-            # 'leaderboard_bbh_disambiguation_qa',
-            # 'leaderboard_bbh_hyperbaton',
-            # 'leaderboard_bbh_logical_deduction_five_objects',
-            # 'leaderboard_bbh_navigate',
-            # 'leaderboard_bbh_object_counting',
-            # 'leaderboard_bbh_reasoning_about_colored_objects',
-            # 'leaderboard_bbh_ruin_names',
-            # 'leaderboard_bbh_salient_translation_error_detection',
-            # 'leaderboard_bbh_sports_understanding',
-            # 'leaderboard_bbh_temporal_sequences',
-            # 'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
-            # 'leaderboard_bbh_tracking_shuffled_objects_three_objects',
-            # 'leaderboard_bbh_web_of_lies', 
-            # 'mastermind_24_easy',
-            # 'mastermind_24_hard',
-            # 'mastermind_35_easy',
-            # 'mastermind_35_hard',
-            # 'mastermind_46_easy',
-            # 'mastermind_46_hard',
-            # 'logiqa',
-            # # 'mmlu',
-            # 'mmlu_stem',
-            # 'mmlu_humanities',
-            # 'mmlu_other',
-            # 'mmlu_pro',
-            # 'mmlu_social_sciences',
-            # 'openbookqa',
-            # 'piqa',
-            # 'sciq',
-            # 'boolq',
-            # 'cb',
-            # 'copa',
-            # 'multirc',
-            # 'record',
-            # 'rte',
-            # 'wic',
-            # 'wsc',
-            # 'super_glue-boolq-t5-prompt',
-            # 'super_glue-cb-t5-prompt',
-            # 'super_glue-copa-t5-prompt',
-            # 'super_glue-multirc-t5-prompt',
-            # 'super_glue-record-t5-prompt',
-            # 'super_glue-rte-t5-prompt',
-            # 'super_glue-wic-t5-prompt',
-            # 'super_glue-wsc-t5-prompt',
-            # 'truthfulqa_mc1',
-            # 'truthfulqa_mc2',
-            # 'truthfulqa_gen',
-            # 'winogrande',
-            # 'wikitext'
+            'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
+            'AraDiCE_piqa_egy',
+            'AraDiCE_ArabicMMLU_high_stem_biology_egy',
+            'arc_easy',
+            'arc_challenge',
+            'anagrams1',
+            'anli_r2',
+            'anli_r1',
+            'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
+            'coqa',
+            'eq_bench',
+            'fda',
+            'cola',
+            'mnli',
+            'mrpc',
+            'qnli',
+            'qqp',
+            'rte',
+            # 'sst',
+            'wnli',
+            'gpqa_main_zeroshot',
+            'gpqa_diamond_zeroshot',
+            'gpqa_extended_zeroshot',
+            'gpqa_main_n_shot',
+            'gpqa_diamond_n_shot',
+            'gpqa_extended_n_shot',
+            'gpqa_main_generative_n_shot',
+            'gpqa_diamond_generative_n_shot',
+            'gpqa_extended_generative_n_shot',
+            'gpqa_main_cot_zeroshot',
+            'gpqa_diamond_cot_zeroshot',
+            'gpqa_extended_cot_zeroshot',
+            'gpqa_main_cot_n_shot',
+            'gpqa_diamond_cot_n_shot',
+            'gpqa_extended_cot_n_shot',
+            'lambada_openai',
+            'lambada_standard',
+            'leaderboard_bbh_causal_judgement',
+            'leaderboard_bbh_disambiguation_qa',
+            'leaderboard_bbh_hyperbaton',
+            'leaderboard_bbh_logical_deduction_five_objects',
+            'leaderboard_bbh_navigate',
+            'leaderboard_bbh_object_counting',
+            'leaderboard_bbh_reasoning_about_colored_objects',
+            'leaderboard_bbh_ruin_names',
+            'leaderboard_bbh_salient_translation_error_detection',
+            'leaderboard_bbh_sports_understanding',
+            'leaderboard_bbh_temporal_sequences',
+            'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
+            'leaderboard_bbh_tracking_shuffled_objects_three_objects',
+            'leaderboard_bbh_web_of_lies', 
+            'mastermind_24_easy',
+            'mastermind_24_hard',
+            'mastermind_35_easy',
+            'mastermind_35_hard',
+            'mastermind_46_easy',
+            'mastermind_46_hard',
+            'logiqa',
+            # 'mmlu',
+            'mmlu_stem',
+            'mmlu_humanities',
+            'mmlu_other',
+            'mmlu_pro',
+            'mmlu_social_sciences',
+            'openbookqa',
+            'piqa',
+            'sciq',
+            'boolq',
+            'cb',
+            'copa',
+            'multirc',
+            'record',
+            'rte',
+            'wic',
+            'wsc',
+            'super_glue-boolq-t5-prompt',
+            'super_glue-cb-t5-prompt',
+            'super_glue-copa-t5-prompt',
+            'super_glue-multirc-t5-prompt',
+            'super_glue-record-t5-prompt',
+            'super_glue-rte-t5-prompt',
+            'super_glue-wic-t5-prompt',
+            'super_glue-wsc-t5-prompt',
+            'truthfulqa_mc1',
+            'truthfulqa_mc2',
+            'truthfulqa_gen',
+            'winogrande',
+            'wikitext'
             ]
 nodes, network_info = build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path)
 print(f"网络架构：{network_info}")
