@@ -40,7 +40,7 @@ parser.add_argument('--percent', type=float, default="0.5", help="merge parts is
 
 # 解析命令行参数
 args = parser.parse_args()
-args.percent = 0.5  # Set the 'percent' argument manually
+args.percent = 0.3  # Set the 'percent' argument manually
 ############################################################################
 # Node类：定义节点行为
 class Node:
@@ -69,8 +69,8 @@ class Node:
         self.tokenizer = None
         self.task_manager = None
         self.model = None
-        self.num_expert = 32
-        self.num_layer = 12
+        self.num_expert = 8
+        self.num_layer = 32
         # 初始化捕获的输出
         self.captured_outputs = {}
         self.captured_one = {}
@@ -80,19 +80,6 @@ class Node:
         self.update_ava = False
         self.update_solution = None
         self.model_fre = None
-        self.name_to_layer_para = [
-            'encoder.block.1.layer.1.mlp',
-            'encoder.block.3.layer.1.mlp',
-            'encoder.block.5.layer.1.mlp',
-            'encoder.block.7.layer.1.mlp',
-            'encoder.block.9.layer.1.mlp',
-            'encoder.block.11.layer.1.mlp',
-            'decoder.block.1.layer.2.mlp',
-            'decoder.block.3.layer.2.mlp',
-            'decoder.block.5.layer.2.mlp',
-            'decoder.block.7.layer.2.mlp',
-            'decoder.block.9.layer.2.mlp',
-            'decoder.block.11.layer.2.mlp'] # 用于存储每一层expert的名字
         self.expanded_task_list = [
             'AraDiCE_ArabicMMLU_high_humanities_history_egy',
             'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
@@ -147,17 +134,28 @@ class Node:
             # 'leaderboard_bbh_tracking_shuffled_objects_three_objects',
             'leaderboard_bbh_web_of_lies', 
             'mastermind_24_easy',
-            'mastermind_24_hard',
+            # 'mastermind_24_hard',
             'mastermind_35_easy',
-            'mastermind_35_hard',
+            # 'mastermind_35_hard',
             'mastermind_46_easy',
-            'mastermind_46_hard',
+            # 'mastermind_46_hard',
             'logiqa',
             # 'mmlu',
             'mmlu_stem',
             'mmlu_humanities',
             'mmlu_other',
-            'mmlu_pro',
+            # 'mmlu_pro_psychology',
+            # 'mmlu_pro_physics',
+            # 'mmlu_pro_philosophy',
+            # 'mmlu_pro_other',
+            # 'mmlu_pro_math',
+            # 'mmlu_pro_law',
+            # 'mmlu_pro_history',
+            # 'mmlu_pro_health',
+            # 'mmlu_pro_engineering',
+            # 'mmlu_pro_economics',
+            # 'mmlu_pro_computer_science',
+            # 'mmlu_pro_chemistry',
             'mmlu_social_sciences',
             'openbookqa',
             'piqa',
@@ -166,7 +164,7 @@ class Node:
             'cb',
             'copa',
             'multirc',
-            'record',
+            # 'record',
             'rte',
             'wic',
             'wsc',
@@ -174,7 +172,7 @@ class Node:
             'super_glue-cb-t5-prompt',
             'super_glue-copa-t5-prompt',
             'super_glue-multirc-t5-prompt',
-            'super_glue-record-t5-prompt',
+            # 'super_glue-record-t5-prompt',
             'super_glue-rte-t5-prompt',
             'super_glue-wic-t5-prompt',
             'super_glue-wsc-t5-prompt',
@@ -188,6 +186,7 @@ class Node:
 
         # self.upload_folder = upload_folder  # 文件上传目录
         self.info_table_path = info_table_path  # 节点信息存储路径
+        self.zero_param = nn.Parameter(torch.zeros(1, 1).to(self.device))
 
         # 创建文件夹并初始化信息表
         os.makedirs(self.upload_folder, exist_ok=True)
@@ -498,7 +497,7 @@ class Node:
         # self.task_dict = extract_task_dict('/root/mo-e_-merge_and_-update_-mec/logs11.log', self.task_group)
 
         # 加载tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained("google/switch-base-32", trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained("llama-moe/LLaMA-MoE-v1-3_5B-2_8", trust_remote_code=True)
         self.task_manager = lm_eval.tasks.TaskManager()
         print(self.ip)
         print(self.device)
@@ -506,7 +505,7 @@ class Node:
 
         
         # 加载模型
-        self.model = HFLM(pretrained="google/switch-base-32", 
+        self.model = HFLM(pretrained="llama-moe/LLaMA-MoE-v1-3_5B-2_8", 
                           trust_remote_code=True ,device=self.device)
         # self.model._model = self.model._model.to_empty(self.device)
 
@@ -535,13 +534,14 @@ class Node:
         for handle in self.hook_handles:
             handle.remove()
         self.hook_handles = []
-        # 明确断开引用
-        del self.model._model
-        self.model = SwitchTransformersForConditionalGeneration.from_pretrained('google/switch-base-32')
-        self.model.to('cpu')
-        modell = self.merge_by_groups_with_usage_frequency_weighting(self.model, self.model_fre, expert_output,names_fre)
+        # # 明确断开引用
+        # del self.model._model
+        # self.model = AutoModelForCausalLM.from_pretrained('llama-moe/LLaMA-MoE-v1-3_5B-2_8', torch_dtype=torch.bfloat16, trust_remote_code=True)
+        self.model._model.to('cpu')
+        modell = self.merge_by_groups_with_usage_frequency_weighting(self.model._model, self.model_fre, expert_output,names_fre)
 
         del results  # 评估结果也可能含有张量引用
+        del self.model
         # 清除 Hook 输出
         self.captured_outputs.clear()
         self.captured_expert_output.clear()
@@ -567,96 +567,89 @@ class Node:
         self.start_inference_thread()
         
     def register_hooks(self,model):
-        numm = 0
-        """注册模型的forward hook"""
+        self.hook_handles = []  # 清理旧的
+
         for name, layer in model._model.named_modules():
-            if 'mlp.router.classifier' in name:
-                # print(name)
+            # 正确 Hook 到 TopKBalancedNoisyGate 层
+            if name.endswith("mlp.gate"):
+                # print(f"[HOOK] Registering gate hook on: {name}")
                 handle = layer.register_forward_hook(self.hook_fn)
-                numm += 1
                 self.hook_handles.append(handle)
-                # print(name,layer)
-                # break
-            if '.wi' in name and 'expert_' in name:
+
+            if 'LinearGLUExperts' in layer.__class__.__name__:
+                # print(f"[HOOK] Registering expert hook on: {name}")
                 handle = layer.register_forward_hook(self.hook_fn_expert)
                 self.hook_handles.append(handle)
-                
+    
+
     def hook_fn(self, module, input, output):
-        """forward hook的处理函数"""
-        layer_name = str(module)
-        if self.layer_count < 6:
-            layer_name = f"encoder_gate_{self.layer_count*2+1}"
-        else:
-            layer_name = f"decoder_gate_{(self.layer_count-6)*2+1}"
-        self.layer_count += 1
-        self.layer_count = self.layer_count % 12
+        layer_name = f"gate_layers_{self.layer_count}"
+        self.layer_count = (self.layer_count + 1) % 32
 
-        router_logits = output.to(torch.float32).cpu().detach()  # 转换为 Float32 后提取router_logits
-        if len(router_logits.squeeze(0).shape) == 2:
-            expert_values = F.softmax(router_logits.squeeze(0), dim=1)
-            expert_values = expert_values.mean(dim=0)
-        else:
-            print(f"Unexpected shape for router_logits: {router_logits.shape}")
-            return
+        # 解析 top-2 routing 结果
+        topk_indices = output['topK_indices']     # shape: [tokens, 2]
+        topk_scores = output['topK_scores']       # shape: [tokens, 2]
+        num_experts = output['load'].shape[0]     # typically 8
 
-        expert_values_list = expert_values.tolist()
+        expert_score_sum = torch.zeros(num_experts)
+
+        # 累加所有 token 的 expert 分配分数
+        for i in range(topk_indices.shape[0]):
+            for k in range(2):  # top-2
+                expert_idx = topk_indices[i, k].item()
+                expert_score = topk_scores[i, k].item()
+                expert_score_sum[expert_idx] += expert_score
+
+        # 归一化（可选）：对 token 数量求平均
+        expert_score_sum /= topk_indices.shape[0]
+
+        expert_values_list = expert_score_sum.tolist()
+
+        # one-hot version: 只统计最常被选中的 expert
         max_value = max(expert_values_list)
-        one_hot_list = [1 if value == max_value else 0 for value in expert_values_list]
+        one_hot_list = [1 if v == max_value else 0 for v in expert_values_list]
 
-        if layer_name in self.captured_outputs:
-            existing_values = self.captured_outputs[layer_name]
-            for i in range(len(expert_values_list)):
-                existing_values[i] += expert_values_list[i]
-            self.captured_outputs[layer_name] = existing_values
-        else:
-            self.captured_outputs[layer_name] = expert_values_list
-
-        if layer_name in self.captured_one:
-            existing_one_hot = self.captured_one[layer_name]
-            for i in range(len(one_hot_list)):
-                existing_one_hot[i] += one_hot_list[i]
-            self.captured_one[layer_name] = existing_one_hot
-        else:
-            self.captured_one[layer_name] = one_hot_list
+        # 累加进记录中
+        self.captured_outputs[layer_name] = [
+            x + y for x, y in zip(self.captured_outputs.get(layer_name, [0]*num_experts), expert_values_list)
+        ]
+        self.captured_one[layer_name] = [
+            x + y for x, y in zip(self.captured_one.get(layer_name, [0]*num_experts), one_hot_list)
+        ]
 
     def hook_fn_expert(self, module, input, output):
         """
-        钩子函数，用于捕获每层的输出并计算其soft activation。
-        module: 当前层的模块
-        input: 该层的输入
-        output: 该层的输出
+        Hook 每层 LinearGLUExperts，获取每个 expert 的单独输出（L2 norm），存入 self.captured_expert_output。
+        跳过已经存在非 NaN 数据的层。
         """
-        # 获取当前层的名字
-        layer_name = str(module)
-        if self.layer_expert_count < self.num_expert * self.num_layer / 2: 
-            layer_name = f"encoder_gate_{(self.layer_expert_count // 32) * 2 + 1}_expert_{self.layer_expert_count % 32}"
-        else:
-            layer_name = f"decoder_gate_{((self.layer_expert_count - self.num_expert * self.num_layer / 2) // 32) * 2 + 1}_expert_{self.layer_expert_count % 32}"
+        try:
+            input_tensor = input[0]  # 从输入 tuple 拿 tensor
+            layer_idx = self.layer_count
+            self.layer_count = (self.layer_count + 1) % self.num_layer
 
-        self.layer_expert_count += 1
-        self.layer_expert_count = self.layer_expert_count % (self.num_expert * self.num_layer)
-        
-        # 检查字典中是否已经存在该层的key
-        if layer_name in self.captured_expert_output:
-            if not math.isnan(self.captured_expert_output[layer_name][0]):
-                return 
-        
-        # 确保 router_logits 是一个标准的 Tensor 类型，并转换为 Float32
-        router_logits = output.to(torch.float32).cpu().detach()  # 转换为 Float32 后提取router_logits
-        
-        # 计算softmax激活，注意：softmax通常应用于最后一个维度（即专家维度）
-        if len(router_logits.shape) == 2:  # 确保是二维张量，通常是 [batch_size, num_experts]
-            soft_activations = F.softmax(router_logits, dim=1)  # 按专家维度应用softmax
-        else:
-            print(f"Unexpected shape for router_logits: {router_logits.shape}")
-            return
-        
-        # 计算soft activations的均值
-        soft_activation_values = soft_activations.mean(dim=0)  # 按专家维度计算均值
-        soft_activation_values_list = soft_activation_values.tolist()  # 转换为列表
-        
-        # 将soft activation存入captured_expert_output
-        self.captured_expert_output[layer_name] = soft_activation_values_list
+            for i in range(self.num_expert):
+                layer_name = f"layers_{layer_idx}_expert_{i}"
+
+                # ✅ 如果已存在非 NaN，有效值则跳过
+                if layer_name in self.captured_expert_output:
+                    cached = self.captured_expert_output[layer_name]
+                    if isinstance(cached, list) and len(cached) > 0 and not math.isnan(cached[0]):
+                        continue
+
+            # 获取所有 expert 的输出
+            expert_outputs = module.forward_all_experts(input_tensor)
+
+            for i, expert_out in enumerate(expert_outputs):
+                key = f"layers_{layer_idx}_expert_{i}"
+
+                act = expert_out.to(torch.float32).detach().cpu()
+                val = torch.norm(act, dim=(0, 1)).item() if act.dim() >= 2 else torch.norm(act).item()
+
+                self.captured_expert_output[key] = [val]
+
+        except Exception as e:
+            print(f"[HOOK ERROR] Failed at layer {self.layer_count}: {e}")
+
     def cross_layer_expert_merge(self, model, frequency_list, group, layer_idx, layer_x,names):
         """
         Merge experts across multiple layers, combining their parameters based on the frequency list weights.
@@ -686,23 +679,21 @@ class Node:
             
             # Loop over the experts in this layer
             for expert_idx in range(len(group_layer)):
-                expert_name = 'expert_'+str(expert_idx)
-                if 'encoder' in name[0]:
-                    expert = model.encoder.block[int(name[-1])].layer[1].mlp.experts[expert_name]
-                else:
-                    expert = model.decoder.block[int(name[-1])].layer[2].mlp.experts[expert_name]
-                # model.layers[cross_layer_idx].mlp.experts[expert_idx]
+                expert_up = model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_up[expert_idx]
+                expert_down = model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_down[expert_idx]
+                expert_gate = model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_gate[expert_idx]
+
                 frequency = frequency_layer[expert_idx]  # Frequency of the current expert
                 
                 # Add weighted parameters to the accumulator
                 if accumulated_up_proj_weight is None:
-                    accumulated_up_proj_weight = expert.wi.weight * frequency
-                    accumulated_down_proj_weight = expert.wo.weight * frequency
-                    # accumulated_gate_proj_weight = expert.gate_proj.weight * frequency
+                    accumulated_up_proj_weight = expert_up * frequency
+                    accumulated_down_proj_weight = expert_down * frequency
+                    accumulated_gate_proj_weight = expert_gate * frequency
                 else:
-                    accumulated_up_proj_weight += expert.wi.weight * frequency
-                    accumulated_down_proj_weight += expert.wo.weight * frequency
-                    # accumulated_gate_proj_weight += expert.gate_proj.weight * frequency
+                    accumulated_up_proj_weight += expert_up * frequency
+                    accumulated_down_proj_weight += expert_down * frequency
+                    accumulated_gate_proj_weight += expert_gate * frequency
                 
                 # Accumulate total weight
                 total_weight += frequency
@@ -711,7 +702,7 @@ class Node:
         if total_weight > 0:
             accumulated_up_proj_weight /= total_weight
             accumulated_down_proj_weight /= total_weight
-            # accumulated_gate_proj_weight /= total_weight
+            accumulated_gate_proj_weight /= total_weight
     
         # Set the merged parameters to the first expert of layer_idx
         # first_expert = model.model.layers[layer_idx].mlp.experts[0]
@@ -719,37 +710,21 @@ class Node:
         first_layer = int(name[-1])
         first_encoder = False
         with torch.no_grad():
-            if 'encoder' in first_name:
-                model.encoder.block[first_layer].layer[1].mlp.experts['expert_0'].wi.weight.copy_(accumulated_up_proj_weight)
-                model.encoder.block[first_layer].layer[1].mlp.experts['expert_0'].wo.weight.copy_(accumulated_down_proj_weight)
-                first_encoder = True
-                
-            else:
-                model.decoder.block[first_layer].layer[2].mlp.experts['expert_0'].wi.weight.copy_(accumulated_up_proj_weight)
-                model.decoder.block[first_layer].layer[2].mlp.experts['expert_0'].wo.weight.copy_(accumulated_down_proj_weight)
-                first_encoder = False
-            # model.model.layers[layer_idx].mlp.experts[0].up_proj.weight.copy_(accumulated_up_proj_weight)
-            # model.model.layers[layer_idx].mlp.experts[0].down_proj.weight.copy_(accumulated_down_proj_weight)
-            # model.model.layers[layer_idx].mlp.experts[0].gate_proj.weight.copy_(accumulated_gate_proj_weight)
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0].copy_(accumulated_up_proj_weight)
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0].copy_(accumulated_down_proj_weight)
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0].copy_(accumulated_gate_proj_weight)
     
         # Bind all experts in the range layer_idx to layer_x-1 to the first expert
         for cross_layer_idx in range(layer_idx, layer_x):
             name = names[cross_layer_idx].split('_')
-            for expert_idx in range(len(group[cross_layer_idx])):
-                expert_name = 'expert_'+str(expert_idx)
-                if 'encoder' in name[0]:
-                    if first_encoder == True:
-                        model.encoder.block[int(name[-1])].layer[1].mlp.experts[expert_name] = model.encoder.block[first_layer].layer[1].mlp.experts['expert_0']
-                    else:
-                        model.encoder.block[int(name[-1])].layer[1].mlp.experts[expert_name] = model.decoder.block[first_layer].layer[2].mlp.experts['expert_0']
-                else:
-                    if first_encoder == True:
-                        model.decoder.block[int(name[-1])].layer[2].mlp.experts[expert_name] = model.encoder.block[first_layer].layer[1].mlp.experts['expert_0']
-                    else:
-                        model.decoder.block[int(name[-1])].layer[2].mlp.experts[expert_name] = model.decoder.block[first_layer].layer[2].mlp.experts['expert_0']
-                
-                # model.model.layers[cross_layer_idx].mlp.experts[expert_idx] = model.model.layers[layer_idx].mlp.experts[0]
-        
+            model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_up[0] = model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0]
+            model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_down[0] = model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0]
+            model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_gate[0] = model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0]
+            for expert_idx in range(1,len(group[cross_layer_idx])):
+                model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_up[expert_idx] = self.zero_param
+                model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_down[expert_idx] = self.zero_param
+                model.model.layers[cross_layer_idx].mlp.calculator.experts.weight_gate[expert_idx] = self.zero_param
+            model.model.layers[cross_layer_idx].mlp.calculator.experts.remap_expert([0 for i in range(8)])  
         print(f"Cross-layer merge completed for layers {layer_idx} to {layer_x-1}")
         return model
 
@@ -771,9 +746,10 @@ class Node:
         Returns:
             PhiMoESparseMoeBlock: The updated PhiMoE block with merged experts.
         """
-        assert len(group) == len(frequency_list) == len(ffn.experts)
+        # assert len(group) == len(frequency_list) == len(ffn.experts)
     
         # Convert group and frequency list to tensors for easier processing
+        mapping = get_expert_remap_mapping(group)
         group_tensor = torch.tensor(group, dtype=torch.long)
         frequency_tensor = torch.tensor(frequency_list, dtype=torch.float)
     
@@ -782,30 +758,41 @@ class Node:
             expert_indices = torch.where(group_tensor == label)[0]
             print(expert_indices)
             expert_indices_int = expert_indices.tolist()
+            expert_indices_int = [int(i) for i in expert_indices_int]
             with torch.no_grad():
-                expert_names = ['expert_'+str(expert_idx) for expert_idx in expert_indices_int]
+                # expert_names = ['expert_'+str(expert_idx) for expert_idx in expert_indices_int]
                 # Accumulate weighted parameters for the group
-                w1_weight_list = torch.stack(
-                    [ffn.experts[expert_names[i]].wi.weight * frequency_tensor[expert_indices[i]] for i in range(len(expert_indices_int))], dim=0
+                gate_weight_list = torch.stack(
+                    [ffn.experts.weight_gate[i]* frequency_tensor[i] for i in expert_indices_int], dim=0
                 )
-                w2_weight_list = torch.stack(
-                    [ffn.experts[expert_names[i]].wo.weight * frequency_tensor[expert_indices[i]] for i in range(len(expert_indices_int))], dim=0
+                down_weight_list = torch.stack(
+                    [ffn.experts.weight_down[i]* frequency_tensor[i] for i in expert_indices_int], dim=0
+                )
+                up_weight_list = torch.stack(
+                    [ffn.experts.weight_up[i]* frequency_tensor[i] for i in expert_indices_int], dim=0
                 )
     
                 # Normalize the weights by their sum
                 total_weight = torch.sum(frequency_tensor[expert_indices])
-                w1_weight = torch.sum(w1_weight_list, dim=0) / (total_weight )
-                w2_weight = torch.sum(w2_weight_list, dim=0) / (total_weight )
+                gate_weight = torch.sum(gate_weight_list, dim=0) / (total_weight )
+                down_weight = torch.sum(down_weight_list, dim=0) / (total_weight )
+                up_weight = torch.sum(up_weight_list, dim=0) / (total_weight )
                 
                 # Set the merged weight to the first expert in the group
-                ffn.experts['expert_'+str(int(expert_indices[0]))].wi.weight.copy_(w1_weight)
-                ffn.experts['expert_'+str(int(expert_indices[0]))].wo.weight.copy_(w2_weight)
+                ffn.experts.weight_gate[expert_indices_int[0]].copy_(gate_weight)
+                ffn.experts.weight_down[expert_indices_int[0]].copy_(down_weight)
+                ffn.experts.weight_up[expert_indices_int[0]].copy_(up_weight)
     
                 # Bind all experts in the group to the first expert (sharing parameters)
-                for expert_idx in expert_names[1:]:
-                    ffn.experts[expert_idx] = ffn.experts[expert_names[0]]
+                for expert_idx in expert_indices_int:
+                    if expert_idx == expert_indices_int[0]:
+                        continue
+                    ffn.experts.weight_gate[expert_idx] = self.zero_param
+                    ffn.experts.weight_down[expert_idx] = self.zero_param
+                    ffn.experts.weight_up[expert_idx] = self.zero_param
                 print(expert_indices[0])
-        
+
+        ffn.experts.remap_expert(mapping)
         return ffn
 
     def adjust_groups_based_on_variance_similarity(self, frequency_list, group):
@@ -998,6 +985,7 @@ class Node:
                 limit = limit/2
             layer_frequencies = frequency_list[layer_idx]
             layer_expert_output = expert_output[layer_idx*num_experts:(layer_idx+1)*num_experts]
+            print(f"length of layer {layer_idx} is :{len(layer_expert_output)}")
             # 初始化组
             current_group_idx = -1
             # 记录当前层的所有分组情况，找出未分组的专家
@@ -1104,24 +1092,11 @@ class Node:
                 group_layer = group[layer_idx]  # Get the group for the current layer
                 frequency_layer = frequency_list[layer_idx]  # Get frequency for the current layer
                 print(f"Normal merging for layer {layer_idx}")
-                if 'encoder' in name_layer[0]:
-                    new_model.encoder.block[int(name_layer[-1])].layer[1].mlp = self._merge_experts_by_usage_frequency_weighting(
-                    ffn=new_model.encoder.block[int(name_layer[-1])].layer[1].mlp,
+                new_model.model.layers[layer_idx].mlp.calculator = self._merge_experts_by_usage_frequency_weighting(
+                    ffn=new_model.model.layers[layer_idx].mlp.calculator,
                     group=group_layer,
                     frequency_list=frequency_layer,
                 )
-                else:
-                    new_model.decoder.block[int(name_layer[-1])].layer[2].mlp = self._merge_experts_by_usage_frequency_weighting(
-                    ffn=new_model.decoder.block[int(name_layer[-1])].layer[2].mlp,
-                    group=group_layer,
-                    frequency_list=frequency_layer,
-                )
-                # # Merge experts for the current layer
-                # model.model.layers[layer_idx].mlp = _merge_experts_by_usage_frequency_weighting(
-                #     ffn=model.model.layers[layer_idx].mlp,
-                #     group=group_layer,
-                #     frequency_list=frequency_layer,
-                # )
                 layer_idx += 1  # Move to the next layer
             print("done!")
         print("all done!")
@@ -1130,71 +1105,59 @@ class Node:
         return new_model
         
     def save_model(self):
-        """保存模型中包含 'expert_' 的部分权重，并保存对应的层名（增强版）"""
-        expert_weights = {}  # 用于存储 expert 层的权重及其对应的层名
-    
+        """保存 LlamaMoEForCausalLM 中所有 expert_ 层的权重及其层名"""
+        expert_weights = {}
+
         try:
             for group_idx, group_data in self.X.items():
                 try:
-                    layer_ids = group_data['layer']  # 获取每个group的layer列表
-                    group_indices = group_data['indices']  # 获取每个group的indices
-                    normalized_weights = group_data['weights']  # 获取每个group的normalized_weights
-    
-                    # 获取layer列表中的最小值（假设为最小的layer索引）
+                    layer_ids = group_data['layer']
+                    group_indices = group_data['indices']
+
                     layer_min_idx = min(layer_ids)
-                    layer_name = self.name_to_layer_para[layer_min_idx]
-    
-                    # 修正 group_indices 类型
+                    layer_name = f'model.layers[{layer_min_idx}]'
+
                     if isinstance(group_indices, int):
                         expert_min_idx = group_indices
                     elif isinstance(group_indices, (list, tuple)):
                         expert_min_idx = min(group_indices)
                     else:
                         raise TypeError(f"Unsupported type for group_indices: {type(group_indices)}")
-                    
-                    # 这里修正负数索引
+
                     if expert_min_idx < 0:
                         logger.warning(f"Expert index {expert_min_idx} is negative, resetting to 0.")
                         expert_min_idx = 0
-    
-                    # 构造对应wi/wo层的名字
-                    wi_name = f"{layer_name}.experts.expert_{expert_min_idx}.wi"
-                    wo_name = f"{layer_name}.experts.expert_{expert_min_idx}.wo"
-    
-                    logger.debug(f"DEBUG: submodule {wi_name} -> {self.local_model._model.get_submodule(wi_name)}")
-                    logger.debug(f"DEBUG: submodule {wo_name} -> {self.local_model._model.get_submodule(wo_name)}")
-    
-                    # 提取权重
-                    wi_submodule = self.local_model._model.get_submodule(wi_name)
-                    wo_submodule = self.local_model._model.get_submodule(wo_name)
-    
-                    if not (hasattr(wi_submodule, 'weight') and hasattr(wo_submodule, 'weight')):
-                        raise AttributeError(f"Submodule {wi_name} or {wo_name} does not have weight attribute.")
-    
-                    wi_weight = wi_submodule.weight.data
-                    wo_weight = wo_submodule.weight.data
-    
-                    # 存储权重到字典
-                    expert_weights[f"group_{group_idx}_wi"] = {
-                        'layer_name': wi_name,
-                        'weight': wi_weight
-                    }
-                    expert_weights[f"group_{group_idx}_wo"] = {
-                        'layer_name': wo_name,
-                        'weight': wo_weight
-                    }
-    
+
+                    # 构造 expert 的路径（基于 LlamaMoEDecoderLayer 中的 LinearGLUExperts）
+                    base_path = f"{layer_name}.mlp.calculator.experts"
+
+                    # 提取三个部分的参数 weight_gate / weight_up / weight_down
+                    for param_type in ["weight_gate", "weight_up", "weight_down"]:
+                        param_list = getattr(self.local_model._model.get_submodule(base_path), param_type, None)
+
+                        if param_list is None or not isinstance(param_list, torch.nn.ParameterList):
+                            raise AttributeError(f"Submodule {base_path} does not contain ParameterList '{param_type}'")
+
+                        param_tensor = param_list[expert_min_idx].detach()  # 安全提取当前 expert 的权重
+                        param_key = f"group_{group_idx}_{param_type}"
+                        param_name = f"{base_path}.{param_type}[{expert_min_idx}]"
+
+                        expert_weights[param_key] = {
+                            'layer_name': param_name,
+                            'weight': param_tensor
+                        }
+
                 except Exception as e:
                     logger.error(f"Error processing group {group_idx}: {e}", exc_info=True)
-                    continue  # 出现问题就跳过当前group，不影响其他
-    
-            # 最后保存到本地
-            model_save_path = os.path.join(self.upload_folder, f"{self.ip}.pt")  # 保持原保存路径（只用了 self.ip）
+                    continue
+
+            # 保存模型权重
+            model_save_path = os.path.join(self.upload_folder, f"{self.ip}.pt")
             torch.save(expert_weights, model_save_path)
             logger.info(f"Model saved successfully at {model_save_path}")
-    
+
             return model_save_path
-    
+
         except Exception as e:
             logger.exception(f"Failed to save model: {e}")
             return None
@@ -1231,68 +1194,59 @@ class Node:
                     print(f"Error downloading file from {ip}: {e}")
 
     def load_expert_weights(self, ip):
-        """从对应的IP节点的文件中加载 expert 权重（wi 和 wo）"""
-        file_path = os.path.join(self.upload_folder, f"{ip}.pt")  # 假设文件名是 IP 地址 + .pt
+        """从对应的IP节点的文件中加载 expert 权重（支持 gate/up/down）"""
+        file_path = os.path.join(self.upload_folder, f"{ip}.pt")
         if not os.path.exists(file_path):
             print(f"File for {ip} not found.")
             return None
 
-        # 加载权重文件
         expert_weights = torch.load(file_path)
-        wi_weights = []
-        wo_weights = []
+        gate_weights, up_weights, down_weights = [], [], []
 
-        # 提取 wi 和 wo 权重
         for key, value in expert_weights.items():
-            if 'wi' in key:  # 提取 wi 权重
-                wi_weights.append(value['weight'])
-            elif 'wo' in key:  # 提取 wo 权重
-                wo_weights.append(value['weight'])
+            if 'weight_gate' in key:
+                gate_weights.append(value['weight'])
+            elif 'weight_up' in key:
+                up_weights.append(value['weight'])
+            elif 'weight_down' in key:
+                down_weights.append(value['weight'])
 
-        return wi_weights, wo_weights
+        return gate_weights, up_weights, down_weights
+
 
     def combine_all_weights_test(self):
-        """从所有节点的文件中整合 wi 和 wo 权重"""
-        combined_weights_wi = []  # 用于存储所有节点的权重
-        combined_weights_wo = []  # 用于存储所有节点的权重
-        # 遍历 self.update_solution 中的 'ip_node'
-        # for ip in self.update_solution.get('ip_node', []):
-        #     # 加载当前节点的权重
-        #     wi_weights, wo_weights = self.load_expert_weights(ip)
+        """从当前节点文件整合 gate/up/down 权重"""
+        combined_gate, combined_up, combined_down = [], [], []
+        gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
 
-        #     if wi_weights is not None and wo_weights is not None:
-        #         # 将 wi 和 wo 权重整合到一起
-        #         combined_weights_wi.extend(wi_weights)  # 添加 wi 权重
-        #         combined_weights_wo.extend(wo_weights)  # 添加 wo 权重
-        wi_weights, wo_weights = self.load_expert_weights(self.ip)
+        if gate_weights is not None:
+            combined_gate.extend(gate_weights)
+            combined_up.extend(up_weights)
+            combined_down.extend(down_weights)
 
-        if wi_weights is not None and wo_weights is not None:
-            # 将 wi 和 wo 权重整合到一起
-            combined_weights_wi.extend(wi_weights)  # 添加 wi 权重
-            combined_weights_wo.extend(wo_weights)  # 添加 wo 权重
-        return combined_weights_wi,combined_weights_wo
+        return combined_gate, combined_up, combined_down
+
 
     def combine_all_weights(self):
-        """从所有节点的文件中整合 wi 和 wo 权重"""
-        combined_weights_wi = []  # 用于存储所有节点的权重
-        combined_weights_wo = []  # 用于存储所有节点的权重
-        # 遍历 self.update_solution 中的 'ip_node'
+        """从所有节点的文件中整合 gate/up/down 权重"""
+        combined_gate, combined_up, combined_down = [], [], []
+
         for ip in self.update_solution.get('ip_node', []):
-            # 加载当前节点的权重
-            wi_weights, wo_weights = self.load_expert_weights(ip)
+            gate_weights, up_weights, down_weights = self.load_expert_weights(ip)
 
-            if wi_weights is not None and wo_weights is not None:
-                # 将 wi 和 wo 权重整合到一起
-                combined_weights_wi.extend(wi_weights)  # 添加 wi 权重
-                combined_weights_wo.extend(wo_weights)  # 添加 wo 权重
-        wi_weights, wo_weights = self.load_expert_weights(self.ip)
+            if gate_weights is not None:
+                combined_gate.extend(gate_weights)
+                combined_up.extend(up_weights)
+                combined_down.extend(down_weights)
 
-        if wi_weights is not None and wo_weights is not None:
-            # 将 wi 和 wo 权重整合到一起
-            combined_weights_wi.extend(wi_weights)  # 添加 wi 权重
-            combined_weights_wo.extend(wo_weights)  # 添加 wo 权重
-        return combined_weights_wi,combined_weights_wo
-    
+        gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
+        if gate_weights is not None:
+            combined_gate.extend(gate_weights)
+            combined_up.extend(up_weights)
+            combined_down.extend(down_weights)
+
+        return combined_gate, combined_up, combined_down
+
 
     def upload_model(self, chunk_size_mb=50, max_retries=3):
         """分块上传模型文件，支持断点续传、进度条显示和自动重传"""
@@ -1443,21 +1397,6 @@ class Node:
         """模拟模型推理并触发更新操作"""
         # 模拟推理过程
         print(f"Node {self.ip} performing model inference...")
-        # pree = min(pree + random.random() * 0.2, 1)
-        # # 20% 的概率选择一个 group
-        # if random.random() < pree:
-        #     # 从 task_group 中随机选择一个 group
-        #     selected_group = random.choice(self.task_group)
-        #     print(f"Selected group: {selected_group}")
-        #     # captured_outputs = {}
-        #     group_ini = selected_group
-        #     pree = 0.1
-    
-        # 从 selected_group 中随机选择一个 task
-        # modell = self.local_model._model
-        # modell.to(self.device)
-        # self.local_model = HFLM(pretrained=modell, trust_remote_code=True,  device=self.device)
-        # self.local_model._model = self.local_model._model.to(self.device)
         tasks = self.expanded_task_list
         if tasks:
             self.start_time = datetime.now()
@@ -1474,7 +1413,7 @@ class Node:
                 num_fewshot=0,
                 task_manager=self.task_manager,
                 batch_size = 1,
-                limit = 300,#500 TODO
+                limit = 200,#500 TODO
                 device = self.device,
             )
             print(f'Before Update in time {datetime.now()}: {results['results']}')
@@ -1506,7 +1445,7 @@ class Node:
                 num_fewshot=0,
                 task_manager=self.task_manager,
                 batch_size = 1,
-                limit = 300,#500 TODO
+                limit = 200,#500 TODO
                 device = self.device,
             )
             print(f'After Update in time {datetime.now()}: {results['results']}')
@@ -1521,82 +1460,9 @@ class Node:
                 print(f"Inference loop error: {e}")
             time.sleep(10)
 
-    def update_process_test(self):
-        delta_time = datetime.now() - self.start_time
-        while self.being_Information and delta_time.total_seconds() < 180:
-            time.sleep(1)
-            delta_time = datetime.now() - self.start_time
-        # 处理接收到的信息 - 没有解TODO
-        if self.being_Information:
-            # 没得到更新
-            print(f"Node {self.ip} cannot get the solution.")
-            self.being_update = False
-            return 
-        # 处理接收到的信息 - 有解 - 开始更新
-        print(f"Node {self.ip} got the solution.")
-        combined_weights_wi,combined_weights_wo = self.combine_all_weights()
-        solution = self.update_solution.get('solution', {})
-        # 遍历 solution 中的每个 ip_node 对应的权重
-        # for ip, weights in solution.items():
-        # 获取该ip对应的权重（假设每个ip对应的权重是一个列表）
-        ip_weights = [1 for i in range(len(combined_weights_wi))]
-        # 对于每个 ip 权重，执行带权加和操作
-        weighted_wi = torch.zeros_like(combined_weights_wi[0])  # 假设wi是一个torch tensor
-        weighted_wo = torch.zeros_like(combined_weights_wo[0])  # 假设wo是一个torch tensor
-        # 对应的每个wi和wo进行加权求和
-        weighted_wi = combined_weights_wi
-        weighted_wo = combined_weights_wo
-        for i, weight in enumerate(ip_weights):
-            weighted_wi += combined_weights_wi[i]
-            weighted_wo += combined_weights_wo[i]
-        group_data = self.Y[0]
-        layer_ids = group_data['layer'] # 获取每个group的layer列表
-        group_indices = group_data['indices']
-        normalized_weights = group_data['weights']
-        # 找到 layer_ids 中的最小值，并从 self.name_to_layer_para 获取对应的层
-        min_layer_idx = min(layer_ids)
-        layer_name = self.name_to_layer_para[min_layer_idx]
-        # 根据 group_indices 获取最小的 expert 索引
-        
-        min_expert_idx = max(min(group_indices),0)
-        expert_name_wi = f"{layer_name}.experts.expert_{min_expert_idx}.wi"
-        expert_name_wo = f"{layer_name}.experts.expert_{min_expert_idx}.wo"
-        with torch.no_grad():
-            # 加载对应的权重
-            wi_layer  = self.local_model._model.get_submodule(expert_name_wi)
-            wi_layer.weight.data.copy_(weighted_wi)
-            wo_layer = self.local_model._model.get_submodule(expert_name_wo)
-            wo_layer.weight.data.copy_(weighted_wo)
-            # 如果只有一个layer，则其他层的 expert 直接指向这个最小值的 expert
-            if len(layer_ids) == 1:
-                for other_expert in group_indices:
-                    if other_expert != min_expert_idx:
-                        other_expert_name_wi = f"{layer_name}.experts.expert_{other_expert}.wi"
-                        other_expert_name_wo = f"{layer_name}.experts.expert_{other_expert}.wo"
-                        para_wi = self.local_model._model.get_submodule(other_expert_name_wi)
-                        para_wi.weight = wi_layer.weight
-                        para_wo = self.local_model._model.get_submodule(other_expert_name_wo)
-                        para_wo.weight = wo_layer.weight
-            # 如果有多个layer，则将所有 expert 指向这个最小值的 expert
-            else:
-                for other_layer_idx in layer_ids:
-                    other_layer_name = self.name_to_layer_para[other_layer_idx]
-                    for expert_idx in range(self.num_expert):
-                        if other_layer_name != layer_name and expert_idx != min_expert_idx:
-                            other_expert_name_wi = f"{other_layer_name}.experts.expert_{expert_idx}.wi"
-                            other_expert_name_wo = f"{other_layer_name}.experts.expert_{expert_idx}.wo"
-                            wi_layer1 = self.local_model._model.get_submodule(other_expert_name_wi)
-                            wo_layer1 = self.local_model._model.get_submodule(other_expert_name_wo)
-                            wi_layer1.weight = wi_layer.weight
-                            wo_layer1.weight = wo_layer.weight
-        # 更新完成，重置状态
-        self.update_solution = {}
-        self.being_update = False
-        self.start_time = datetime.now()
-
     def update_process(self):
         delta_time = datetime.now() - self.start_time
-        while self.being_Information and delta_time.total_seconds() < 180:
+        while self.being_Information and delta_time.total_seconds() < 3600:
             time.sleep(1)
             delta_time = datetime.now() - self.start_time
         # 处理接收到的信息 - 没有解
@@ -1607,62 +1473,65 @@ class Node:
             return 
         # 处理接收到的信息 - 有解 - 开始更新
         print(f"Node {self.ip} got the solution.")
-        combined_weights_wi,combined_weights_wo = self.combine_all_weights()
+        combined_gate, combined_up, combined_down = self.combine_all_weights()
         solution = self.update_solution.get('solution', { })
         # 遍历 solution 中的每个 ip_node 对应的权重
         for ip, weights in solution.items():
-            # 获取该ip对应的权重（假设每个ip对应的权重是一个列表）
             ip_weights = weights
-            # 对于每个 ip 权重，执行带权加和操作
-            weighted_wi = torch.zeros_like(combined_weights_wi[0])  # 假设wi是一个torch tensor
-            weighted_wo = torch.zeros_like(combined_weights_wo[0])  # 假设wo是一个torch tensor
-            # 对应的每个wi和wo进行加权求和
+
+            weighted_gate = torch.zeros_like(combined_gate[0])
+            weighted_up = torch.zeros_like(combined_up[0])
+            weighted_down = torch.zeros_like(combined_down[0])
+
             for i, weight in enumerate(ip_weights):
-                weighted_wi += weight * combined_weights_wi[i]
-                weighted_wo += weight * combined_weights_wo[i]
+                weighted_gate += weight * combined_gate[i]
+                weighted_up += weight * combined_up[i]
+                weighted_down += weight * combined_down[i]
+
             group_data = self.Y[ip]
-            layer_ids = group_data['layer'] # 获取每个group的layer列表
+            layer_ids = group_data['layer']
             group_indices = group_data['indices']
             normalized_weights = group_data['weights']
-            # 找到 layer_ids 中的最小值，并从 self.name_to_layer_para 获取对应的层
+
             min_layer_idx = min(layer_ids)
-            layer_name = self.name_to_layer_para[min_layer_idx]
-            # 根据 group_indices 获取最小的 expert 索引
-            min_expert_idx = max(min(group_indices),0)
-            expert_name_wi = f"{layer_name}.experts.expert_{min_expert_idx}.wi"
-            expert_name_wo = f"{layer_name}.experts.expert_{min_expert_idx}.wo"
+            layer_name = f'model.layers[{min_layer_idx}]'
+            min_expert_idx = max(min(group_indices), 0)
+
+            base_path = f"{layer_name}.mlp.calculator.experts"
+            experts_module = self.local_model._model.get_submodule(base_path)
+
             with torch.no_grad():
-                # 加载对应的权重
-                wi_layer  = self.local_model._model.get_submodule(expert_name_wi)
-                wi_layer.weight.data.copy_(weighted_wi)
-                wo_layer = self.local_model._model.get_submodule(expert_name_wo)
-                wo_layer.weight.data.copy_(weighted_wo)
-                # 如果只有一个layer，则其他层的 expert 直接指向这个最小值的 expert
-                if len(layer_ids) == 1:
+                experts_module.weight_gate[min_expert_idx].copy_(weighted_gate)
+                experts_module.weight_up[min_expert_idx].copy_(weighted_up)
+                experts_module.weight_down[min_expert_idx].copy_(weighted_down)
+
+                if len(layer_ids) == 1:#TODO
                     for other_expert in group_indices:
                         if other_expert != min_expert_idx:
-                            other_expert_name_wi = f"{layer_name}.experts.expert_{other_expert}.wi"
-                            other_expert_name_wo = f"{layer_name}.experts.expert_{other_expert}.wo"
-                            para_wi = self.local_model._model.get_submodule(other_expert_name_wi)
-                            para_wi.weight = wi_layer.weight
-                            para_wo = self.local_model._model.get_submodule(other_expert_name_wo)
-                            para_wo.weight = wo_layer.weight
-                # 如果有多个layer，则将所有 expert 指向这个最小值的 expert
+                            experts_module.weight_gate[other_expert] = self.zero_param
+                            experts_module.weight_up[other_expert] = self.zero_param
+                            experts_module.weight_down[other_expert] = self.zero_param
+                            experts_module.remap_expert_idx(other_expert, min_expert_idx)
                 else:
                     for other_layer_idx in layer_ids:
-                        other_layer_name = self.name_to_layer_para[other_layer_idx]
+                        other_layer_name = f'model.layers[{other_layer_idx}]'
+                        # if other_layer_name == layer_name:
+                        #     continue
+                        other_module = self.local_model._model.get_submodule(f"{other_layer_name}.mlp.calculator.experts")
                         for expert_idx in range(self.num_expert):
-                            if other_layer_name != layer_name and expert_idx != min_expert_idx:
-                                other_expert_name_wi = f"{other_layer_name}.experts.expert_{expert_idx}.wi"
-                                other_expert_name_wo = f"{other_layer_name}.experts.expert_{expert_idx}.wo"
-                                wi_layer1 = self.local_model._model.get_submodule(other_expert_name_wi)
-                                wo_layer1 = self.local_model._model.get_submodule(other_expert_name_wo)
-                                wi_layer1.weight = wi_layer.weight
-                                wo_layer1.weight = wo_layer.weight
-        # 更新完成，重置状态
+                            if expert_idx != min_expert_idx:
+                                other_module.weight_gate[expert_idx] = self.zero_param
+                                other_module.weight_up[expert_idx] = self.zero_param
+                                other_module.weight_down[expert_idx] = self.zero_param
+                            else:
+                                other_module.weight_gate[expert_idx] = experts_module.weight_gate[min_expert_idx]
+                                other_module.weight_up[expert_idx] = experts_module.weight_up[min_expert_idx]
+                                other_module.weight_down[expert_idx] = experts_module.weight_down[min_expert_idx]
+                            other_module.remap_expert_idx(expert_idx, min_expert_idx)
         self.update_solution = {}
         self.being_update = False
         self.start_time = datetime.now()
+
         
 ####################################
     def start_flask_server(self):
@@ -1809,7 +1678,7 @@ def initialize_model_sequentially(nodes):
     print("All inference threads started.")
 
 # 示例使用
-num_nodes = 32
+num_nodes = 16
 neighbors_count = 4
 base_info_path = 'node_info.json'
 expanded_task_list = [
@@ -1866,17 +1735,28 @@ expanded_task_list = [
             # 'leaderboard_bbh_tracking_shuffled_objects_three_objects',
             'leaderboard_bbh_web_of_lies', 
             'mastermind_24_easy',
-            'mastermind_24_hard',
+            # 'mastermind_24_hard',
             'mastermind_35_easy',
-            'mastermind_35_hard',
+            # 'mastermind_35_hard',
             'mastermind_46_easy',
-            'mastermind_46_hard',
+            # 'mastermind_46_hard',
             'logiqa',
             # 'mmlu',
             'mmlu_stem',
             'mmlu_humanities',
             'mmlu_other',
-            'mmlu_pro',
+            # 'mmlu_pro_psychology',
+            # 'mmlu_pro_physics',
+            # 'mmlu_pro_philosophy',
+            # 'mmlu_pro_other',
+            # 'mmlu_pro_math',
+            # 'mmlu_pro_law',
+            # 'mmlu_pro_history',
+            # 'mmlu_pro_health',
+            # 'mmlu_pro_engineering',
+            # 'mmlu_pro_economics',
+            # 'mmlu_pro_computer_science',
+            # 'mmlu_pro_chemistry',
             'mmlu_social_sciences',
             'openbookqa',
             'piqa',
@@ -1885,7 +1765,7 @@ expanded_task_list = [
             'cb',
             'copa',
             'multirc',
-            'record',
+            # 'record',
             'rte',
             'wic',
             'wsc',
@@ -1893,7 +1773,7 @@ expanded_task_list = [
             'super_glue-cb-t5-prompt',
             'super_glue-copa-t5-prompt',
             'super_glue-multirc-t5-prompt',
-            'super_glue-record-t5-prompt',
+            # 'super_glue-record-t5-prompt',
             'super_glue-rte-t5-prompt',
             'super_glue-wic-t5-prompt',
             'super_glue-wsc-t5-prompt',

@@ -463,32 +463,48 @@ class _bootstrap_internal:
         return res
 
 
-def bootstrap_stderr(f, xs, iters):
-    import multiprocessing as mp
+# def bootstrap_stderr(f, xs, iters):TODO
+#     import multiprocessing as mp
 
-    pool = mp.Pool(mp.cpu_count())
-    # this gives a biased estimate of the stderr (i.e w/ the mean, it gives something
-    # equivalent to stderr calculated without Bessel's correction in the stddev.
-    # Unfortunately, I haven't been able to figure out what the right correction is
-    # to make the bootstrap unbiased - i considered multiplying by sqrt(n/(n-1)) but
-    # that would be ad-hoc and I can't prove that that would actually be an unbiased estimator)
-    # Thankfully, shouldn't matter because our samples are pretty big usually anyways
-    res = []
-    chunk_size = min(1000, iters)
+#     pool = mp.Pool(mp.cpu_count())
+#     # this gives a biased estimate of the stderr (i.e w/ the mean, it gives something
+#     # equivalent to stderr calculated without Bessel's correction in the stddev.
+#     # Unfortunately, I haven't been able to figure out what the right correction is
+#     # to make the bootstrap unbiased - i considered multiplying by sqrt(n/(n-1)) but
+#     # that would be ad-hoc and I can't prove that that would actually be an unbiased estimator)
+#     # Thankfully, shouldn't matter because our samples are pretty big usually anyways
+#     res = []
+#     chunk_size = min(1000, iters)
+#     from tqdm import tqdm
+
+#     print("bootstrapping for stddev:", f.__name__)
+#     for bootstrap in tqdm(
+#         pool.imap(
+#             _bootstrap_internal(f, chunk_size),
+#             [(i, xs) for i in range(iters // chunk_size)],
+#         ),
+#         total=iters // chunk_size,
+#     ):
+#         # sample w replacement
+#         res.extend(bootstrap)
+
+#     pool.close()
+#     return sample_stddev(res)
+def bootstrap_stderr(f, xs, iters):
+    import random
     from tqdm import tqdm
 
-    print("bootstrapping for stddev:", f.__name__)
-    for bootstrap in tqdm(
-        pool.imap(
-            _bootstrap_internal(f, chunk_size),
-            [(i, xs) for i in range(iters // chunk_size)],
-        ),
-        total=iters // chunk_size,
-    ):
-        # sample w replacement
-        res.extend(bootstrap)
+    print("bootstrapping for stddev (sequential):", f.__name__)
+    res = []
 
-    pool.close()
+    chunk_size = min(1000, iters)
+
+    for _ in tqdm(range(iters // chunk_size), total=iters // chunk_size):
+        for _ in range(chunk_size):
+            # 每次 bootstrap 采样
+            sample = [random.choice(xs) for _ in range(len(xs))]
+            res.append(f(sample))
+
     return sample_stddev(res)
 
 

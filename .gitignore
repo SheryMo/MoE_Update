@@ -25,3 +25,6 @@ lm_eval/caching/.cache
 wandb
 examples/wandb
 google/
+*.bin
+*.model
+network_info/*

@@ -29,6 +29,30 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+def get_expert_remap_mapping(group: List[int]) -> List[int]:
+    """
+    Convert arbitrary group labels into expert remap mapping.
+    Each expert will be mapped to the first expert in its group.
+
+    Args:
+        group (List[int]): e.g., [10, 10, 11, 11, 15, 15]
+
+    Returns:
+        List[int]: Mapping for set_expert_mapping, e.g., [0, 0, 2, 2, 4, 4]
+    """
+    mapping = []
+    group_tensor = torch.tensor(group, dtype=torch.long)
+    unique_groups = group_tensor.unique(sorted=True)
+    group_to_indices = {int(g): (group_tensor == g).nonzero(as_tuple=False).view(-1).tolist() for g in unique_groups}
+    
+    # Each group: map all indices to the first expert in that group
+    for i in range(len(group_tensor)):
+        current_group = int(group_tensor[i])
+        target_idx = group_to_indices[current_group][0]  # use first expert in group as target
+        mapping.append(target_idx)
+
+    return mapping
+
 def clean_and_report_cuda_tensors(context_label="未命名"):
     print(f"\n===== 🚀【CUDA 检查开始】[{context_label}] =====")
     
@@ -166,36 +190,41 @@ def compute_similarity_between_layers(layer_variance_1, layer_variance_2):
     )[0][0]
     return cos_sim
 
-def map_to_range(data,name, new_min=0.1, new_max=0.9):
-    if name == []:
-        # 定义函数，将每个小列表映射到[0.1, 0.9]区间
-        result = []
-        names = []
-        for gate, values in data.items():
-            old_min = min(values)
-            old_max = max(values)
-            # 遍历每个值进行归一化
-            normalized_values = [
-                0 if math.isnan(value) else value
-                for value in values
+def map_to_range(data: dict, name_list=None, new_min=0.1, new_max=0.9):
+    """
+    将 data 中的每个 expert 向量值归一化到 [new_min, new_max] 区间。
+    如果 name_list 为 None，则使用 data.keys() 顺序；否则严格按 name_list 顺序提取。
+
+    返回:
+        result: List[List[float]] 归一化后的二维数组
+        names:  List[str] 对应每一行的 key 名
+    """
+    result = []
+    names = name_list if name_list else list(data.keys())
+
+    for key in names:
+        values = data.get(key, [])
+
+        if not values:
+            result.append([0.0] * 8)  # 或其他默认值
+            continue
+
+        values = [0.0 if math.isnan(v) else v for v in values]
+
+        old_min = min(values)
+        old_max = max(values)
+
+        # 避免除以 0 的情况（所有值相等）
+        if old_max == old_min:
+            scaled = [new_min for _ in values]
+        else:
+            scaled = [
+                new_min + (v - old_min) / (old_max - old_min) * (new_max - new_min)
+                for v in values
             ]
-            result.append(normalized_values)
-            names.append(gate)
-    else:
-        result = [[] for ii in name]
-        names = name
-        for namem in names:
-            vales = data[namem]
-            old_min = min(values)
-            old_max = max(values)
-            # 遍历每个值进行归一化
-            normalized_values = [
-                0 if math.isnan(value) else value
-                for value in values
-            ]
-            result.append(normalized_values)
-    
-    return result,names
+        result.append(scaled)
+
+    return result, names
 
 def get_model_size(model):
     total_size = 0

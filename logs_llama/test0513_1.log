@@ -1,0 +1,13 @@
+nohup: ignoring input
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_adg.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_fic.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_wn.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+WARNING:accelerate.utils.other:Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+INFO:lm_eval.models.huggingface:Using device 'cuda:0'
+INFO:lm_eval.models.huggingface:Model type cannot be determined. Using default model type 'causal'
+INFO:lm_eval.models.huggingface:Model parallel was set to False, max memory was not set, and device map was set to {'': 'cuda:0'}
+网络架构：{'122': ['94', '221', '130', '124', '18', '98', '78'], '18': ['122', '78', '96', '221', '229', '146', '131', '26', '124'], '229': ['96', '18', '130', '131'], '94': ['122', '130', '12', '146', '150', '221'], '146': ['124', '12', '78', '18', '94'], '98': ['131', '221', '122', '150', '135', '96'], '131': ['124', '18', '229', '78', '98', '26', '12', '221'], '26': ['12', '150', '18', '131', '130', '221'], '150': ['12', '130', '78', '94', '98', '26', '124'], '135': ['78', '98', '130', '12', '96', '221'], '130': ['26', '96', '94', '135', '122', '229', '150', '78'], '124': ['221', '18', '150', '146', '122', '131', '12'], '78': ['130', '146', '12', '122', '18', '131', '150', '135'], '96': ['135', '98', '229', '12', '18', '130'], '12': ['96', '150', '124', '131', '94', '146', '26', '135', '78'], '221': ['26', '94', '135', '131', '122', '18', '98', '124']}
+122
+cuda:0
+gpqa_diamond_cot_n_shot
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]
