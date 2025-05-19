@@ -28,3 +28,4 @@ google/
 *.bin
 *.model
 network_info/*
+saved_models/*

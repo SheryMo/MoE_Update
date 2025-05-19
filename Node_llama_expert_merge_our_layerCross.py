@@ -28,7 +28,27 @@ import copy
 import gc
 import logging
 import queue
+from multiprocessing import Semaphore, Process
+import multiprocessing
 
+def run_node_inference_with_limit(node, semaphore):
+    with semaphore:
+        try:
+            node.model_inference_and_update_loop()
+        except Exception as e:
+            print(f"[Process {node.ip}] Error during inference: {e}")
+
+def start_nodes_with_limited_concurrency(nodes, max_concurrent=2):
+    semaphore = Semaphore(max_concurrent)
+    processes = []
+
+    for node in nodes:
+        p = Process(target=run_node_inference_with_limit, args=(node, semaphore))
+        p.start()
+        processes.append(p)
+
+    return processes
+    
 logger = logging.getLogger("save_model")
 logger.setLevel(logging.DEBUG)
 ########################################################################################
@@ -1543,8 +1563,10 @@ class Node:
         ).start()
 
     def start_inference_thread(self):
-        """启动模型推理的线程"""
-        threading.Thread(target=self.model_inference_and_update_loop, daemon=True).start()
+        """此函数可选，如果你仍希望类内启动单个推理进程"""
+        from multiprocessing import Process
+        p = Process(target=self.model_inference_and_update_loop)
+        p.start()
 
     def stop_flask_server(self):
         """停止Flask服务器"""
@@ -1662,18 +1684,17 @@ def initialize_model_sequentially(nodes):
         thread.start()
         threads.append(thread)
 
-    # # 等待所有 Flask server 确实启动
-    # for node in nodes:
-    #     if not wait_for_port(node.ip, node.port):
-    #         raise TimeoutError(f"Flask server at {node.ip}:{node.port} did not start in time!")
-    print("All Flask servers are ready.")
 
-    # 【3】阶段3：统一启动推理线程
-    inference_threads = []
-    for node in nodes:
-        thread = threading.Thread(target=node.start_inference_thread)
-        thread.start()
-        inference_threads.append(thread)
+    # 启动多进程推理，每次最多运行 2 个节点
+    processes = start_nodes_with_limited_concurrency(nodes, max_concurrent=2)
+
+    try:
+        for p in processes:
+            p.join()
+    except KeyboardInterrupt:
+        print("Exiting gracefully.")
+        for p in processes:
+            p.terminate()
 
     print("All inference threads started.")
 
