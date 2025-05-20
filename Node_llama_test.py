@@ -30,7 +30,7 @@ import logging
 import queue
 from multiprocessing import Semaphore, Process
 import multiprocessing
-
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 global_node_infor = {}
 
 def run_node_inference_with_limit(node, semaphore):
@@ -79,8 +79,8 @@ class Node:
         os.makedirs(self.upload_folder, exist_ok=True)  # 创建文件存储目录
         self.node_info_table = {}
         # 消息队列
-        self.message_queue = queue.Queue()
-        threading.Thread(target=self._process_message_queue, daemon=True).start()
+        # self.message_queue = queue.Queue()
+        # threading.Thread(target=self._process_message_queue, daemon=True).start()
         
         self.gpu_id = gpu_id  # 分配的 GPU ID
         self.device = f"cuda:{self.gpu_id}" if self.gpu_id is not None else "cpu"
@@ -120,7 +120,7 @@ class Node:
             'mnli',
             'mrpc',
             'qnli',
-            'qqp',
+            # 'qqp',
             'rte',
             # 'sst',
             'wnli',
@@ -216,10 +216,10 @@ class Node:
             with open(self.info_table_path, 'w') as f:
                 json.dump({}, f)
                 
-        # 初始化Flask应用
-        self.app = Flask(__name__)
-        self.app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 单块最大200MB
-        self._initialize_routes()
+        # # 初始化Flask应用
+        # self.app = Flask(__name__)
+        # self.app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 单块最大200MB
+        # self._initialize_routes()
         
         self.port = 5000 + int(self.ip)
         
@@ -465,9 +465,9 @@ class Node:
             cal_X = self.calculate_X(X)
             compare_X.extend(cal_X)
             ip_length.append(len(cal_X))
-        sel_XX = self.calculate_X(self.X)
-        compare_X.extend(sel_XX)
-        ip_length.append(len(sel_XX))
+        # sel_XX = self.calculate_X(self.X)
+        # compare_X.extend(sel_XX)
+        # ip_length.append(len(sel_XX))
         return compare_X,ip_length
 
     def check_linear_valuable(self):
@@ -486,18 +486,7 @@ class Node:
             # 将compare_X转化为NumPy矩阵
             A = np.array(compare_X)
             b = np.array(y)
-
-            try:
-                # 使用最小二乘法求解线性方程 A*w = b
-                w, residuals, rank, s = np.linalg.lstsq(A, b, rcond=None)
-
-                # 判断是否有有效解
-                if residuals.size > 0 and residuals[0] > 1e-5:  # 对残差做简单判断TODO
-                    return False, None  # 如果残差大于阈值，返回False，表示没有有效的线性组合
-
-            except np.linalg.LinAlgError:
-                # 如果发生异常，说明没有有效解
-                return False, None  # 返回False，表示没有有效的线性组合
+            w = np.random.randn(A.shape[0])
             solution.append(w)  # 将解添加到solution列表中
         solu['solution'] = solution
         return True, solu  # 如果所有行都可以线性组合得到，返回True并且返回权重向量w
@@ -565,7 +554,10 @@ class Node:
         # clean_and_report_cuda_tensors("after model release")
 
         # modell = modell.to('cpu')
-        self.local_model = HFLM(pretrained=modell, trust_remote_code=True,  device=self.device)
+        self.local_model = HFLM(pretrained="llama-moe/LLaMA-MoE-v1-3_5B-2_8", 
+                          trust_remote_code=True ,device=self.device)
+        modell.to(self.device)
+        self.local_model._model = modell
         model_size = get_model_size(modell)
         print(f"Model size: {model_size:.4f} GB")
         # clean_and_report_cuda_tensors("after create model")
@@ -723,9 +715,9 @@ class Node:
         first_layer = int(name[-1])
         first_encoder = False
         with torch.no_grad():
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0].copy_(accumulated_up_proj_weight)
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0].copy_(accumulated_down_proj_weight)
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0].copy_(accumulated_gate_proj_weight)
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0]= nn.Parameter(accumulated_up_proj_weight.to(self.device))
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0]= nn.Parameter(accumulated_down_proj_weight.to(self.device))
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0]= nn.Parameter(accumulated_gate_proj_weight.to(self.device))
     
         # Bind all experts in the range layer_idx to layer_x-1 to the first expert
         for cross_layer_idx in range(layer_idx, layer_x):
@@ -792,9 +784,9 @@ class Node:
                 up_weight = torch.sum(up_weight_list, dim=0) / (total_weight )
                 
                 # Set the merged weight to the first expert in the group
-                ffn.experts.weight_gate[expert_indices_int[0]].copy_(gate_weight)
-                ffn.experts.weight_down[expert_indices_int[0]].copy_(down_weight)
-                ffn.experts.weight_up[expert_indices_int[0]].copy_(up_weight)
+                ffn.experts.weight_gate[expert_indices_int[0]]= nn.Parameter(gate_weight.to(self.device))
+                ffn.experts.weight_down[expert_indices_int[0]]= nn.Parameter(down_weight.to(self.device))
+                ffn.experts.weight_up[expert_indices_int[0]]= nn.Parameter(up_weight.to(self.device))
     
                 # Bind all experts in the group to the first expert (sharing parameters)
                 for expert_idx in expert_indices_int:
@@ -1251,12 +1243,12 @@ class Node:
                 combined_gate.extend(gate_weights)
                 combined_up.extend(up_weights)
                 combined_down.extend(down_weights)
-
-        gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
-        if gate_weights is not None:
-            combined_gate.extend(gate_weights)
-            combined_up.extend(up_weights)
-            combined_down.extend(down_weights)
+        if self.ip not in self.update_solution.get('ip_node', []):
+            gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
+            if gate_weights is not None:
+                combined_gate.extend(gate_weights)
+                combined_up.extend(up_weights)
+                combined_down.extend(down_weights)
 
         return combined_gate, combined_up, combined_down
 
@@ -1399,6 +1391,7 @@ class Node:
 
         self.hook_handles = []
         self.register_hooks(self.local_model)
+        print(f'selected task is: {selected_task}')
         results = lm_eval.simple_evaluate(
             model=self.local_model,
             tasks=[self.selected_task],
@@ -1523,14 +1516,22 @@ class Node:
         # # 处理接收到的信息 - 有解 - 开始更新
         print(f"Node {self.ip} got the solution.")
         combined_gate, combined_up, combined_down = self.combine_all_weights()
-        solution = self.update_solution.get('solution', { })
+        combined_gate = [x.to(self.device) for x in combined_gate]
+        combined_up = [x.to(self.device) for x in combined_up]
+        combined_down = [x.to(self.device) for x in combined_down]
+        solution = self.update_solution.get('solution', [])
         # 遍历 solution 中的每个 ip_node 对应的权重
-        for ip, weights in solution.items():
+        for ip, weights in enumerate(solution):
             ip_weights = weights
+            print(f"Example weights: {solution[0]}")
+            print(f"Type of weights: {type(solution[0])}")
+            print(f"Len of combined_gate: {len(combined_gate)}")
+            weighted_gate = torch.zeros_like(combined_gate[0], device=self.device)
+            weighted_up = torch.zeros_like(combined_up[0], device=self.device)
+            weighted_down = torch.zeros_like(combined_down[0], device=self.device)
 
-            weighted_gate = torch.zeros_like(combined_gate[0])
-            weighted_up = torch.zeros_like(combined_up[0])
-            weighted_down = torch.zeros_like(combined_down[0])
+            print(f"len(ip_weights): {len(ip_weights)}")
+            print(f"len(combined_gate): {len(combined_gate)}")
 
             for i, weight in enumerate(ip_weights):
                 weighted_gate += weight * combined_gate[i]
@@ -1550,9 +1551,9 @@ class Node:
             experts_module = self.local_model._model.get_submodule(base_path)
 
             with torch.no_grad():
-                experts_module.weight_gate[min_expert_idx].copy_(weighted_gate)
-                experts_module.weight_up[min_expert_idx].copy_(weighted_up)
-                experts_module.weight_down[min_expert_idx].copy_(weighted_down)
+                experts_module.weight_gate[min_expert_idx] = nn.Parameter(weighted_gate.to(self.device))
+                experts_module.weight_up[min_expert_idx]= nn.Parameter(weighted_up.to(self.device))
+                experts_module.weight_down[min_expert_idx]= nn.Parameter(weighted_down.to(self.device))
 
                 if len(layer_ids) == 1:#TODO
                     for other_expert in group_indices:
@@ -1723,8 +1724,8 @@ def initialize_model_sequentially(nodes):
 
 
 # 示例使用
-num_nodes = 32
-neighbors_count = 31
+num_nodes = 3
+neighbors_count = 1
 base_info_path = 'node_info.json'
 expanded_task_list = [
             # 'AraDiCE_ArabicMMLU_high_humanities_history_egy',
@@ -1739,12 +1740,12 @@ expanded_task_list = [
             # 'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
             'coqa',
             'eq_bench',
-            'fda',
+            # 'fda',
             'cola',
             'mnli',
             'mrpc',
             'qnli',
-            'qqp',
+            # 'qqp',
             'rte',
             # 'sst',
             'wnli',
@@ -1825,8 +1826,7 @@ expanded_task_list = [
             # 'truthfulqa_mc1',
             # 'truthfulqa_mc2',
             # 'truthfulqa_gen',
-            'winogrande',
-            'wikitext'
+            'winogrande'
             ]
 nodes, network_info = build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path)
 print(f"网络架构：{network_info}")
