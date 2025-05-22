@@ -1604,7 +1604,7 @@ class Node:
         func()
 
 
-def build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path='node_info.json', num_gpus=8):
+def build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path='node_info.json', num_gpus=3):
     # 随机生成唯一的IP地址
     def generate_unique_ip(existing_ips):
         while True:
@@ -1724,7 +1724,7 @@ def initialize_model_sequentially(nodes):
 
 
 # 示例使用
-num_nodes = 3
+num_nodes = 2
 neighbors_count = 1
 base_info_path = 'node_info.json'
 expanded_task_list = [

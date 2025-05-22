@@ -1,0 +1,309 @@
+nohup: ignoring input
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_adg.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_fic.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+DEBUG:lm_eval.tasks:File _evalita-mp_ner_wn.yaml in /public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/lm_eval/tasks/evalita_llm could not be loaded
+WARNING:accelerate.utils.other:Detected kernel version 3.10.0, which is below the recommended minimum of 5.5.0; this can cause the process to hang. It is recommended to upgrade the kernel to the minimum version or higher.
+INFO:lm_eval.models.huggingface:Using device 'cpu'
+INFO:lm_eval.models.huggingface:Model type cannot be determined. Using default model type 'causal'
+INFO:lm_eval.models.huggingface:Model parallel was set to False, max memory was not set, and device map was set to {'': 'cpu'}
+网络架构：{'199': ['153'], '153': ['199']}
+199
+cpu
+wic
+Loading checkpoint shards:   0%|          | 0/2 [00:00<?, ?it/s]Loading checkpoint shards:  50%|█████     | 1/2 [00:21<00:21, 21.78s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:29<00:00, 13.42s/it]Loading checkpoint shards: 100%|██████████| 2/2 [00:29<00:00, 14.67s/it]
+INFO:lm_eval.evaluator:Setting random seed to 0 | Setting numpy seed to 1234 | Setting torch manual seed to 1234 | Setting fewshot manual seed to 1234
+INFO:lm_eval.evaluator:Using pre-initialized model
+WARNING:lm_eval.api.task:[Task: wic] metric acc is defined, but aggregation is not. using default aggregation=mean
+WARNING:lm_eval.api.task:[Task: wic] metric acc is defined, but higher_is_better is not. using default higher_is_better=True
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): hf-mirror.com:443
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue HTTP/1.1" 307 63
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): s3.amazonaws.com:443
+DEBUG:urllib3.connectionpool:https://s3.amazonaws.com:443 "HEAD /datasets.huggingface.co/datasets/datasets/super_glue/super_glue.py HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue HTTP/1.1" 307 63
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): hf-mirror.com:443
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "HEAD /datasets/super_glue/resolve/3de24cf8022e94f4ee4b9d55a6f539891524d646/README.md HTTP/1.1" 307 0
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "HEAD /datasets/aps/super_glue/resolve/3de24cf8022e94f4ee4b9d55a6f539891524d646/README.md HTTP/1.1" 200 0
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue/revision/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 113
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue/revision/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646?recursive=False&expand=False HTTP/1.1" 307 138
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646?recursive=False&expand=False HTTP/1.1" 200 501
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 234
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646/axb?recursive=False&expand=False HTTP/1.1" 307 142
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646/axb?recursive=False&expand=False HTTP/1.1" 200 232
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 234
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): hf-mirror.com:443
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue/revision/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 113
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue/revision/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 None
+DEBUG:urllib3.connectionpool:Starting new HTTPS connection (1): hf-mirror.com:443
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "HEAD /datasets/super_glue/resolve/3de24cf8022e94f4ee4b9d55a6f539891524d646/dataset_infos.json HTTP/1.1" 307 0
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "HEAD /datasets/aps/super_glue/resolve/3de24cf8022e94f4ee4b9d55a6f539891524d646/dataset_infos.json HTTP/1.1" 404 0
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646/wic?recursive=False&expand=False HTTP/1.1" 307 142
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/datasets/aps/super_glue/tree/3de24cf8022e94f4ee4b9d55a6f539891524d646/wic?recursive=False&expand=False HTTP/1.1" 200 356
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 307 115
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "POST /api/datasets/aps/super_glue/paths-info/3de24cf8022e94f4ee4b9d55a6f539891524d646 HTTP/1.1" 200 235
+DEBUG:filelock:Attempting to acquire lock 139767163232832 on /public/home/zouyifei001/.cache/huggingface/datasets/_public_home_zouyifei001_.cache_huggingface_datasets_super_glue_wic_0.0.0_3de24cf8022e94f4ee4b9d55a6f539891524d646.lock
+DEBUG:filelock:Lock 139767163232832 acquired on /public/home/zouyifei001/.cache/huggingface/datasets/_public_home_zouyifei001_.cache_huggingface_datasets_super_glue_wic_0.0.0_3de24cf8022e94f4ee4b9d55a6f539891524d646.lock
+DEBUG:fsspec.local:open file: /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646/dataset_info.json
+DEBUG:filelock:Attempting to release lock 139767163232832 on /public/home/zouyifei001/.cache/huggingface/datasets/_public_home_zouyifei001_.cache_huggingface_datasets_super_glue_wic_0.0.0_3de24cf8022e94f4ee4b9d55a6f539891524d646.lock
+DEBUG:filelock:Lock 139767163232832 released on /public/home/zouyifei001/.cache/huggingface/datasets/_public_home_zouyifei001_.cache_huggingface_datasets_super_glue_wic_0.0.0_3de24cf8022e94f4ee4b9d55a6f539891524d646.lock
+DEBUG:filelock:Attempting to acquire lock 139767100633552 on /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646_builder.lock
+DEBUG:filelock:Lock 139767100633552 acquired on /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646_builder.lock
+DEBUG:fsspec.local:open file: /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646/dataset_info.json
+DEBUG:filelock:Attempting to release lock 139767100633552 on /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646_builder.lock
+DEBUG:filelock:Lock 139767100633552 released on /public/home/zouyifei001/.cache/huggingface/datasets/super_glue/wic/0.0.0/3de24cf8022e94f4ee4b9d55a6f539891524d646_builder.lock
+DEBUG:lm_eval.api.task:No custom filters defined. Using default 'take_first' filter for handling repeats.
+WARNING:lm_eval.evaluator:Overwriting default num_fewshot of wic from None to 0
+INFO:lm_eval.api.task:Building contexts for wic on rank 0...
+  0%|          | 0/5 [00:00<?, ?it/s]100%|██████████| 5/5 [00:00<00:00, 1472.62it/s]
+DEBUG:lm_eval.evaluator:Task: wic; number of requests on this rank: 10
+INFO:lm_eval.evaluator:Running loglikelihood requests
+Running loglikelihood requests:   0%|          | 0/10 [00:00<?, ?it/s]Running loglikelihood requests:  10%|█         | 1/10 [01:26<12:56, 86.30s/it]Running loglikelihood requests:  30%|███       | 3/10 [03:06<06:56, 59.46s/it]Running loglikelihood requests:  50%|█████     | 5/10 [05:45<05:48, 69.73s/it]Running loglikelihood requests:  70%|███████   | 7/10 [08:22<03:40, 73.44s/it]Running loglikelihood requests:  90%|█████████ | 9/10 [10:45<01:12, 72.66s/it]Running loglikelihood requests: 100%|██████████| 10/10 [10:45<00:00, 64.50s/it]
+DEBUG:urllib3.connectionpool:Resetting dropped connection: hf-mirror.com
+DEBUG:urllib3.connectionpool:https://hf-mirror.com:443 "GET /api/models/llama-moe/LLaMA-MoE-v1-3_5B-2_8/revision/main HTTP/1.1" 200 927
+full model:
+{'wic': {'alias': 'wic', 'acc,none': 0.2, 'acc_stderr,none': 0.2}}
+length of layer 0 is :8
+length of layer 1 is :8
+length of layer 2 is :8
+length of layer 3 is :8
+length of layer 4 is :8
+length of layer 5 is :8
+length of layer 6 is :8
+length of layer 7 is :8
+length of layer 8 is :8
+length of layer 9 is :8
+length of layer 10 is :8
+length of layer 11 is :8
+length of layer 12 is :8
+length of layer 13 is :8
+length of layer 14 is :8
+length of layer 15 is :8
+length of layer 16 is :8
+length of layer 17 is :8
+length of layer 18 is :8
+length of layer 19 is :8
+length of layer 20 is :8
+length of layer 21 is :8
+length of layer 22 is :8
+length of layer 23 is :8
+length of layer 24 is :8
+length of layer 25 is :8
+length of layer 26 is :8
+length of layer 27 is :8
+length of layer 28 is :8
+length of layer 29 is :8
+length of layer 30 is :8
+length of layer 31 is :8
+0.5858404368895506
+0.5525051659461709
+0.5741709940422559
+0.9191716500860148
+0.4212333033139744
+0.9271826377605733
+0.6342092907349104
+0.2004349215374222
+0.5333843191007012
+0.08814583388113946
+0.3883738923766875
+0.4134960943679103
+0.5729870091261086
+0.41983237094479503
+0.5622325893127084
+0.40317387497894996
+0.7852606576243861
+0.2728965888925853
+0.6478886108722733
+0.31131738064926834
+0.7947031179081124
+0.5941701944880957
+0.790097942017975
+0.526575345534327
+0.1552162823171789
+0.22965280415867362
+0.2382694493723147
+0.46405641861919644
+0.3434618433353072
+0.5858404368895506
+0.5525051659461709
+0.5741709940422559
+0.9191716500860148
+0.4212333033139744
+0.9271826377605733
+0.6342092907349104
+0.2004349215374222
+0.5333843191007012
+0.08814583388113946
+0.3883738923766875
+0.4134960943679103
+0.5729870091261086
+0.41983237094479503
+0.5622325893127084
+0.40317387497894996
+0.7852606576243861
+0.2728965888925853
+0.6478886108722733
+0.31131738064926834
+0.7947031179081124
+0.5941701944880957
+0.790097942017975
+0.526575345534327
+0.1552162823171789
+0.22965280415867362
+0.2382694493723147
+0.46405641861919644
+Total groups 70 exceeded the threshold, stopping comparison.
+The group tensor is
+[5, 4, 7, 0, 6, 2, 3, 1]
+tensor([5, 4, 7, 0, 6, 2, 3, 1], dtype=torch.int32)
+[0, 1, 2, 3, 4, 5, 6, 7]
+The group tensor is
+[7, 3, 2, 4, 1, 5, 6, 0]
+tensor([7, 3, 2, 4, 1, 5, 6, 0], dtype=torch.int32)
+[0, 1, 2, 3, 4, 5, 6, 7]
+The group tensor is
+[4, 6, 0, 5, 3, 2, 7, 1]
+tensor([4, 6, 0, 5, 3, 2, 7, 1], dtype=torch.int32)
+[0, 1, 2, 3, 4, 5, 6, 7]
+The group tensor is
+[-2, -2, -2, -2, -2, -2, -2, -2]
+tensor([-2, -2, -2, -2, -2, -2, -2, -2], dtype=torch.int32)
+[-2]
+The group tensor is
+[7, 6, 0, 4, 5, 1, 3, 2]
+tensor([7, 6, 0, 4, 5, 1, 3, 2], dtype=torch.int32)
+[0, 1, 2, 3, 4, 5, 6, 7]
+The group tensor is
+[3, 5, 1, 4, 7, 2, 0, 6]
+tensor([3, 5, 1, 4, 7, 2, 0, 6], dtype=torch.int32)
+[0, 1, 2, 3, 4, 5, 6, 7]
+The group tensor is
+[-2, -2, -2, -2, -2, -2, -2, -2]
+tensor([-2, -2, -2, -2, -2, -2, -2, -2], dtype=torch.int32)
+[-2]
+The group tensor is
+[3, 0, 1, 0, 2, 1, 3, 2]
+tensor([3, 0, 1, 0, 2, 1, 3, 2], dtype=torch.int32)
+[0, 1, 2, 3]
+The group tensor is
+[-2, -2, -2, -2, -2, -2, -2, -2]
+tensor([-2, -2, -2, -2, -2, -2, -2, -2], dtype=torch.int32)
+[-2]
+Normal merging for layer 1
+tensor([7])
+tensor(7)
+tensor([4])
+tensor(4)
+tensor([2])
+tensor(2)
+tensor([1])
+tensor(1)
+tensor([3])
+tensor(3)
+tensor([5])
+tensor(5)
+tensor([6])
+tensor(6)
+tensor([0])
+tensor(0)
+done!
+Normal merging for layer 2
+tensor([2])
+tensor(2)
+tensor([7])
+tensor(7)
+tensor([5])
+tensor(5)
+tensor([4])
+tensor(4)
+tensor([0])
+tensor(0)
+tensor([3])
+tensor(3)
+tensor([1])
+tensor(1)
+tensor([6])
+tensor(6)
+done!
+Cross-layer merge completed for layers 3 to 4
+done!
+Normal merging for layer 5
+tensor([2])
+tensor(2)
+tensor([5])
+tensor(5)
+tensor([7])
+tensor(7)
+tensor([6])
+tensor(6)
+tensor([3])
+tensor(3)
+tensor([4])
+tensor(4)
+tensor([1])
+tensor(1)
+tensor([0])
+tensor(0)
+done!
+Normal merging for layer 6
+tensor([6])
+tensor(6)
+tensor([2])
+tensor(2)
+tensor([5])
+tensor(5)
+tensor([0])
+tensor(0)
+tensor([3])
+tensor(3)
+tensor([1])
+tensor(1)
+tensor([7])
+tensor(7)
+tensor([4])
+tensor(4)
+done!
+Cross-layer merge completed for layers 7 to 20
+done!
+Normal merging for layer 21
+tensor([1, 3])
+tensor(1)
+tensor([2, 5])
+tensor(2)
+tensor([4, 7])
+tensor(4)
+tensor([0, 6])
+tensor(0)
+done!
+Cross-layer merge completed for layers 22 to 31
+done!
+all done!
+Traceback (most recent call last):
+  File "/public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/Node_llama_test.py", line 1835, in <module>
+    initialize_model_sequentially(nodes)
+  File "/public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/Node_llama_test.py", line 1708, in initialize_model_sequentially
+    node.initialize_model()
+  File "/public/home/zouyifei001/project/mo-e_-merge_and_-update_-mec/Node_llama_test.py", line 551, in initialize_model
+    torch.cuda.set_device(self.gpu_id)
+  File "/public/home/zouyifei001/perl5/miniconda3/envs/MoEUpdate/lib/python3.12/site-packages/torch/cuda/__init__.py", line 527, in set_device
+    device = _get_device_index(device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/public/home/zouyifei001/perl5/miniconda3/envs/MoEUpdate/lib/python3.12/site-packages/torch/cuda/_utils.py", line 38, in _get_device_index
+    return _torch_get_device_index(device, optional, allow_cpu)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/public/home/zouyifei001/perl5/miniconda3/envs/MoEUpdate/lib/python3.12/site-packages/torch/_utils.py", line 853, in _get_device_index
+    raise ValueError(
+ValueError: Expected a torch.device with a specified index or an integer, but got:None

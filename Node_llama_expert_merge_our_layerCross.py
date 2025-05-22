@@ -497,10 +497,10 @@ class Node:
 
             try:
                 # 使用最小二乘法求解线性方程 A*w = b
-                w, residuals, rank, s = np.linalg.lstsq(A, b, rcond=None)
+                w, residuals, rank, s = np.linalg.lstsq(A.T, b, rcond=None)
 
                 # 判断是否有有效解
-                if residuals.size > 0 and residuals[0] > 1e-5:  # 对残差做简单判断TODO
+                if residuals.size > 0 and residuals[0] > 1e-2:  # 对残差做简单判断TODO
                     return False, None  # 如果残差大于阈值，返回False，表示没有有效的线性组合
 
             except np.linalg.LinAlgError:
@@ -573,7 +573,8 @@ class Node:
         clean_and_report_cuda_tensors("after model release")
 
         modell = modell.to('cpu')
-        self.local_model = HFLM(pretrained=modell, trust_remote_code=True,  device=self.device)
+        self.local_model = HFLM(pretrained="llama-moe/LLaMA-MoE-v1-3_5B-2_8", trust_remote_code=True,  device=self.device)
+        self.local_model._model = modell
         model_size = get_model_size(modell)
         print(f"Model size: {model_size:.4f} GB")
         clean_and_report_cuda_tensors("after create model")
@@ -730,9 +731,9 @@ class Node:
         first_layer = int(name[-1])
         first_encoder = False
         with torch.no_grad():
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0].copy_(accumulated_up_proj_weight)
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0].copy_(accumulated_down_proj_weight)
-            model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0].copy_(accumulated_gate_proj_weight)
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_up[0]= nn.Parameter(accumulated_up_proj_weight.to(self.device))
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_down[0]= nn.Parameter(accumulated_down_proj_weight.to(self.device))
+            model.model.layers[layer_idx].mlp.calculator.experts.weight_gate[0]= nn.Parameter(accumulated_gate_proj_weight.to(self.device))
     
         # Bind all experts in the range layer_idx to layer_x-1 to the first expert
         for cross_layer_idx in range(layer_idx, layer_x):
@@ -799,9 +800,10 @@ class Node:
                 up_weight = torch.sum(up_weight_list, dim=0) / (total_weight )
                 
                 # Set the merged weight to the first expert in the group
-                ffn.experts.weight_gate[expert_indices_int[0]].copy_(gate_weight)
-                ffn.experts.weight_down[expert_indices_int[0]].copy_(down_weight)
-                ffn.experts.weight_up[expert_indices_int[0]].copy_(up_weight)
+                ffn.experts.weight_gate[expert_indices_int[0]]= nn.Parameter(gate_weight.to(self.device))
+                ffn.experts.weight_down[expert_indices_int[0]]= nn.Parameter(down_weight.to(self.device))
+                ffn.experts.weight_up[expert_indices_int[0]]= nn.Parameter(up_weight.to(self.device))
+    
     
                 # Bind all experts in the group to the first expert (sharing parameters)
                 for expert_idx in expert_indices_int:
@@ -1259,11 +1261,12 @@ class Node:
                 combined_up.extend(up_weights)
                 combined_down.extend(down_weights)
 
-        gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
-        if gate_weights is not None:
-            combined_gate.extend(gate_weights)
-            combined_up.extend(up_weights)
-            combined_down.extend(down_weights)
+        if self.ip not in self.update_solution.get('ip_node', []):
+            gate_weights, up_weights, down_weights = self.load_expert_weights(self.ip)
+            if gate_weights is not None:
+                combined_gate.extend(gate_weights)
+                combined_up.extend(up_weights)
+                combined_down.extend(down_weights)
 
         return combined_gate, combined_up, combined_down
 
@@ -1426,7 +1429,9 @@ class Node:
             self.captured_expert_output = {}
             self.selected_task = selected_task
             self.hook_handles = []
+            self.local_model._model = self.local_model._model.to(self.device)
             self.register_hooks(self.local_model)
+            print(f'selected task is: {selected_task}')
             results = lm_eval.simple_evaluate( # call simple_evaluate squad_completion
                 model=self.local_model,
                 tasks=[selected_task],
@@ -1494,14 +1499,18 @@ class Node:
         # 处理接收到的信息 - 有解 - 开始更新
         print(f"Node {self.ip} got the solution.")
         combined_gate, combined_up, combined_down = self.combine_all_weights()
-        solution = self.update_solution.get('solution', { })
+        combined_gate = [x.to(self.device) for x in combined_gate]
+        combined_up = [x.to(self.device) for x in combined_up]
+        combined_down = [x.to(self.device) for x in combined_down]
+        solution = self.update_solution.get('solution', [])
+        print(f'the length of solution is: {len(solution)}')
         # 遍历 solution 中的每个 ip_node 对应的权重
-        for ip, weights in solution.items():
+        for ip, weights in enumerate(solution):
             ip_weights = weights
 
-            weighted_gate = torch.zeros_like(combined_gate[0])
-            weighted_up = torch.zeros_like(combined_up[0])
-            weighted_down = torch.zeros_like(combined_down[0])
+            weighted_gate = torch.zeros_like(combined_gate[0], device=self.device)
+            weighted_up = torch.zeros_like(combined_up[0], device=self.device)
+            weighted_down = torch.zeros_like(combined_down[0], device=self.device)
 
             for i, weight in enumerate(ip_weights):
                 weighted_gate += weight * combined_gate[i]
@@ -1521,9 +1530,9 @@ class Node:
             experts_module = self.local_model._model.get_submodule(base_path)
 
             with torch.no_grad():
-                experts_module.weight_gate[min_expert_idx].copy_(weighted_gate)
-                experts_module.weight_up[min_expert_idx].copy_(weighted_up)
-                experts_module.weight_down[min_expert_idx].copy_(weighted_down)
+                experts_module.weight_gate[min_expert_idx] = nn.Parameter(weighted_gate.to(self.device))
+                experts_module.weight_up[min_expert_idx]= nn.Parameter(weighted_up.to(self.device))
+                experts_module.weight_down[min_expert_idx]= nn.Parameter(weighted_down.to(self.device))
 
                 if len(layer_ids) == 1:#TODO
                     for other_expert in group_indices:
