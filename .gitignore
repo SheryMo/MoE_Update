@@ -29,3 +29,4 @@ google/
 *.model
 network_info/*
 saved_models/*
+logs_llama/*.loglogs_llama/*.log
