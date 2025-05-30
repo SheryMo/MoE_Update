@@ -8,6 +8,8 @@
 #
 
 LOGF="llm_setup.log"
+export HOME=/local/home/rrMo
+mkdir -p $HOME
 
 function update_system()
 {
