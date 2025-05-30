@@ -18,11 +18,46 @@ function update_system()
     sudo apt-get install -y python3-pip wget git
 }
 
+function create_extfs() {
+  record_log "Creating ext4 filesystem on /dev/sda4"
+  sudo mkfs.ext4 -Fq /dev/sda4
+}
+
+function mountfs() {
+  sudo mkdir ${MOUNT_DIR}
+  sudo mount -t ext4 /dev/sda4 ${MOUNT_DIR}
+
+  if [[ $? != 0 ]]; then
+    record_log "Partition might be corrupted"
+    create_extfs
+    mountfs
+  fi
+
+  sudo chown -R ${USER}:${GROUP} ${MOUNT_DIR}
+}
+
+prepare_local_partition() {
+  record_log "Preparing local partition ..."
+
+  MOUNT_POINT=$(mount -v | grep "/dev/sda4" | awk '{print $3}')
+
+  if [[ x"${MOUNT_POINT}" == x"${MOUNT_DIR}" ]];then
+    record_log "/dev/sda4 is already mounted on ${MOUNT_POINT}"
+    return
+  fi
+
+  if [ x$(sudo file -sL /dev/sda4 | grep -o ext4) == x"" ]; then
+    create_extfs;
+  fi
+
+  mountfs
+}
+
 function install_miniconda()
 {
     echo "==> Installing Miniconda..." | tee -a $LOGF
     local INSTALLER="Anaconda3-2024.10-1-Linux-x86_64.sh"
-    wget -c https://repo.anaconda.com/archive/$INSTALLER
+    sudo wget -c https://repo.anaconda.com/archive/$INSTALLER
     bash $INSTALLER -b -p $HOME/anaconda3
 
     export PATH=$HOME/anaconda3/bin:$PATH
@@ -87,6 +122,7 @@ EOF
 function main()
 {
     update_system
+    prepare_local_partition
     install_miniconda
     setup_conda_env
     install_dependencies

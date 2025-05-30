@@ -161,7 +161,7 @@ for i in range(params.nodeCount):
     pass
 
     # HCL: ``setup-host.sh`` will perform initial settings to the cloudlab node
-    node.addService(pg.Execute('/bin/bash','/local/repository/silly.sh'))
+    node.addService(pg.Execute('/bin/sh','/local/repository/silly.sh'))
 
 # Print the generated rspec
 pc.printRequestRSpec(request)
