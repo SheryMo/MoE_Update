@@ -6,7 +6,7 @@
 # This script sets up a Python/Conda environment for LLM workloads, installs
 # required packages, and downloads the model from Hugging Face.
 #
-
+MOUNT_DIR=/local/rrMo
 LOGF="llm_setup.log"
 export HOME=/local/home/rrMo
 mkdir -p $HOME
