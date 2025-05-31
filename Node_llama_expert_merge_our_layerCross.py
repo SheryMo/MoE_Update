@@ -30,7 +30,20 @@ import logging
 import queue
 from multiprocessing import Semaphore, Process
 import multiprocessing
+import netifaces
 
+def get_neighbor_ips(local_ip, base_range=16):
+    base_prefix = '.'.join(local_ip.split('.')[:3])
+    local_last = int(local_ip.split('.')[-1])
+    return [f"{base_prefix}.{i}" for i in range(base_range) if i != local_last]
+
+
+def get_local_ip(interface='eth1'):
+    try:
+        return netifaces.ifaddresses(interface)[netifaces.AF_INET][0]['addr']
+    except Exception as e:
+        raise RuntimeError(f"Failed to get IP for interface {interface}: {e}")
+    
 def run_node_inference_with_limit(node, semaphore):
     with semaphore:
         try:
@@ -219,7 +232,7 @@ class Node:
         self.app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 单块最大200MB
         self._initialize_routes()
         
-        self.port = 5000 + int(self.ip)
+        self.port = 5000 + int(self.ip.split('.')[-1]) #TODO: 这里的端口号分配逻辑可以根据实际情况调整
         
         # 初始化捕获的专家输出
         self.captured_expert_output = {}
@@ -314,7 +327,7 @@ class Node:
     def _process_message_queue(self):
         while True:
             try:
-                data = self.message_queue.get(timeout=5)  # 最多等待5秒
+                data = self.message_queue.get(timeout=50)  # 最多等待5秒
             except queue.Empty:
                 # 队列五秒内没有消息，跳过或可执行其他操作
                 continue
@@ -977,94 +990,140 @@ class Node:
     
         return result_dict
     
-    def assign_experts_to_groups_by_similarity(
-        self,
-            frequency_list,
-        expert_output, 
-    ) :
-        """
-        根据专家的原始频率信息，选择每层中最大频率的专家作为定点，
-        并将其他专家与定点专家进行相似度比较，按照相似度超过0.7来分组。
+    # def assign_experts_to_groups_by_similarity(
+    #     self,
+    #         frequency_list,
+    #     expert_output, 
+    # ) :
+    #     """
+    #     根据专家的原始频率信息，选择每层中最大频率的专家作为定点，
+    #     并将其他专家与定点专家进行相似度比较，按照相似度超过0.7来分组。
     
-        Args:
-            frequency_list (list of list of float): 32x16 的列表，表示32层中每层16个专家的频率。
+    #     Args:
+    #         frequency_list (list of list of float): 32x16 的列表，表示32层中每层16个专家的频率。
     
-        Returns:
-            group (list of list of int): 32x16 的列表，表示每层16个专家所属的组索引。
-        """
-        num_layers = len(frequency_list)
-        num_experts = len(frequency_list[0])  # 每层有60个专家
-        # print(num_experts)
-        group = [[-1 for _ in range(num_experts)] for _ in range(num_layers)]  # 初始化组标签
-        limit = num_experts  # 组的最大数量
-        # 遍历每一层
-        for layer_idx in range(num_layers):
-            if layer_idx == int(num_layers/4):
-                limit = limit/4*3
-            if layer_idx == int(num_layers/2):
-                limit = limit/3*2
-            if layer_idx == int(num_layers/4*3):
-                limit = limit/2
-            layer_frequencies = frequency_list[layer_idx]
-            layer_expert_output = expert_output[layer_idx*num_experts:(layer_idx+1)*num_experts]
-            print(f"length of layer {layer_idx} is :{len(layer_expert_output)}")
-            # 初始化组
-            current_group_idx = -1
-            # 记录当前层的所有分组情况，找出未分组的专家
-            ungrouped_experts = list(range(num_experts))
-            while current_group_idx < limit:
-                current_group_idx += 1
-                if current_group_idx == limit:
-                    break
-                anchor_expert_idx = max(ungrouped_experts, key=lambda idx: layer_frequencies[idx])
-                group[layer_idx][anchor_expert_idx] = current_group_idx
-                ungrouped_experts.remove(anchor_expert_idx)
-            current_group_idx = -1
-            while True:
-                ungrouped_experts = [idx for idx, value in enumerate(group[layer_idx]) if value == -1]
-                if not ungrouped_experts:  # 如果没有未分组的专家，停止分组
-                    break
-                current_group_idx +=1
-                if current_group_idx >= limit:
-                    break
-                # 选择当前未分组的最大频率专家作为定点
-                anchor_expert_idx = [idx for idx, value in enumerate(group[layer_idx]) if value == current_group_idx]
-                anchor_expert_idx = anchor_expert_idx[0]
-                anchor_expert_output = layer_expert_output[anchor_expert_idx]
-                # group[layer_idx][anchor_expert_idx] = current_group_idx  # 将定点专家归为第一个组
-                numm = 0
-                cos_simi = [-1 for _ in range(num_experts)]
-                # 遍历其他未分组专家，与定点专家计算相似度
-                for expert_idx in ungrouped_experts:
-                    current_expert_output = layer_expert_output[expert_idx]
+    #     Returns:
+    #         group (list of list of int): 32x16 的列表，表示每层16个专家所属的组索引。
+    #     """
+    #     num_layers = len(frequency_list)
+    #     num_experts = len(frequency_list[0])  # 每层有60个专家
+    #     # print(num_experts)
+    #     group = [[-1 for _ in range(num_experts)] for _ in range(num_layers)]  # 初始化组标签
+    #     limit = num_experts  # 组的最大数量
+    #     # 遍历每一层
+    #     for layer_idx in range(num_layers):
+    #         if layer_idx == int(num_layers/4):
+    #             limit = limit/4*3
+    #         if layer_idx == int(num_layers/2):
+    #             limit = limit/3*2
+    #         if layer_idx == int(num_layers/4*3):
+    #             limit = limit/2
+    #         layer_frequencies = frequency_list[layer_idx]
+    #         layer_expert_output = expert_output[layer_idx*num_experts:(layer_idx+1)*num_experts]
+    #         print(f"length of layer {layer_idx} is :{len(layer_expert_output)}")
+    #         # 初始化组
+    #         current_group_idx = -1
+    #         # 记录当前层的所有分组情况，找出未分组的专家
+    #         ungrouped_experts = list(range(num_experts))
+    #         while current_group_idx < limit:
+    #             current_group_idx += 1
+    #             if current_group_idx == limit:
+    #                 break
+    #             anchor_expert_idx = max(ungrouped_experts, key=lambda idx: layer_frequencies[idx])
+    #             group[layer_idx][anchor_expert_idx] = current_group_idx
+    #             ungrouped_experts.remove(anchor_expert_idx)
+    #         current_group_idx = -1
+    #         while True:
+    #             ungrouped_experts = [idx for idx, value in enumerate(group[layer_idx]) if value == -1]
+    #             if not ungrouped_experts:  # 如果没有未分组的专家，停止分组
+    #                 break
+    #             current_group_idx +=1
+    #             if current_group_idx >= limit:
+    #                 break
+    #             # 选择当前未分组的最大频率专家作为定点
+    #             anchor_expert_idx = [idx for idx, value in enumerate(group[layer_idx]) if value == current_group_idx]
+    #             anchor_expert_idx = anchor_expert_idx[0]
+    #             anchor_expert_output = layer_expert_output[anchor_expert_idx]
+    #             # group[layer_idx][anchor_expert_idx] = current_group_idx  # 将定点专家归为第一个组
+    #             numm = 0
+    #             cos_simi = [-1 for _ in range(num_experts)]
+    #             # 遍历其他未分组专家，与定点专家计算相似度
+    #             for expert_idx in ungrouped_experts:
+    #                 current_expert_output = layer_expert_output[expert_idx]
                     
-                    # 计算当前专家和定点专家之间的余弦相似度
-                    cos_sim = cosine_similarity(
-                        np.array(anchor_expert_output).reshape(1, -1),
-                        np.array(current_expert_output).reshape(1, -1)
-                    )[0][0]
+    #                 # 计算当前专家和定点专家之间的余弦相似度
+    #                 cos_sim = cosine_similarity(
+    #                     np.array(anchor_expert_output).reshape(1, -1),
+    #                     np.array(current_expert_output).reshape(1, -1)
+    #                 )[0][0]
                     
-                    cos_simi[expert_idx] = cos_sim
-                # 将相似度超过0.7的专家分到当前组
-                while True:
-                    best_match_idx = np.argmax(cos_simi)
-                    if cos_simi[best_match_idx] == -1:
-                        break
-                    if layer_expert_output[best_match_idx][0] == 0:
-                        cos_simi[best_match_idx] = -1
-                        continue
-                    group[layer_idx][best_match_idx] = current_group_idx
-                    ungrouped_experts.remove(best_match_idx)  # 将已分组专家从未分组列表中移除
-                    break
-            ungrouped_experts = [idx for idx, value in enumerate(group[layer_idx]) if value == -1]
-            # 如果有专家未分组，则将其归为最后一组
-            if ungrouped_experts:
-                for expert_idx in ungrouped_experts:
-                    group[layer_idx][expert_idx] = limit - 1  # 将剩余专家归为最后一组
-                ungrouped_experts.clear()  # 清空未分组专家列表
+    #                 cos_simi[expert_idx] = cos_sim
+    #             # 将相似度超过0.7的专家分到当前组
+    #             while True:
+    #                 best_match_idx = np.argmax(cos_simi)
+    #                 if cos_simi[best_match_idx] == -1:
+    #                     break
+    #                 if layer_expert_output[best_match_idx][0] == 0:
+    #                     cos_simi[best_match_idx] = -1
+    #                     continue
+    #                 group[layer_idx][best_match_idx] = current_group_idx
+    #                 ungrouped_experts.remove(best_match_idx)  # 将已分组专家从未分组列表中移除
+    #                 break
+    #         ungrouped_experts = [idx for idx, value in enumerate(group[layer_idx]) if value == -1]
+    #         # 如果有专家未分组，则将其归为最后一组
+    #         if ungrouped_experts:
+    #             for expert_idx in ungrouped_experts:
+    #                 group[layer_idx][expert_idx] = limit - 1  # 将剩余专家归为最后一组
+    #             ungrouped_experts.clear()  # 清空未分组专家列表
                         
-        return group
+    #     return group
+    def assign_experts_to_groups_by_similarity(frequency_list, expert_output):
+        num_layers = len(frequency_list)
+        num_experts = len(frequency_list[0])
+        group = [[-1 for _ in range(num_experts)] for _ in range(num_layers)]
 
+        # 使用幂函数生成递增的权重（0层到num_layers-1），再归一化到 [min, max] 范围
+        decay_power = 2.0  # 越大前层越细分
+        raw_weights = np.linspace(1, 0, num_layers) ** decay_power
+        normalized_thresholds = np.interp(raw_weights, (raw_weights.min(), raw_weights.max()), 
+                                        [1 / (num_experts * 2), 1 / 2])  # 最小阈值为 1/(2*num_experts)，最大为 1/2
+
+        for layer_idx in range(num_layers):
+            threshold = normalized_thresholds[layer_idx]
+
+            layer_frequencies = frequency_list[layer_idx]
+            layer_expert_output = expert_output[layer_idx * num_experts : (layer_idx + 1) * num_experts]
+
+            # Step 1: 选中心 expert
+            anchor_indices = []
+            min_threshold = 1e-6  # 极限下限防死循环
+            decay_factor = 0.8  # 如果一个都没选中，就继续下降
+            while not anchor_indices and threshold >= min_threshold:
+                anchor_indices = [idx for idx, freq in enumerate(layer_frequencies) if freq > threshold]
+                if not anchor_indices:
+                    threshold *= decay_factor
+
+            current_group_idx = 0
+            for anchor_idx in anchor_indices:
+                group[layer_idx][anchor_idx] = current_group_idx
+                current_group_idx += 1
+
+            # Step 2: 相似度归类
+            ungrouped_experts = [idx for idx in range(num_experts) if group[layer_idx][idx] == -1]
+            for expert_idx in ungrouped_experts:
+                current_output = np.array(layer_expert_output[expert_idx]).reshape(1, -1)
+                best_similarity = -1
+                best_group_idx = -1
+                for i, anchor_idx in enumerate(anchor_indices):
+                    anchor_output = np.array(layer_expert_output[anchor_idx]).reshape(1, -1)
+                    sim = cosine_similarity(current_output, anchor_output)[0][0]
+                    if sim > best_similarity:
+                        best_similarity = sim
+                        best_group_idx = i
+                group[layer_idx][expert_idx] = best_group_idx if best_group_idx != -1 else current_group_idx
+
+        return group
+    
     def merge_by_groups_with_usage_frequency_weighting(
         self,
             model,
@@ -1188,7 +1247,7 @@ class Node:
         """从所有节点下载文件"""
         # 读取当前的节点信息表TODO
         # with open(self.info_table_path, 'r') as f:
-        #     node_info_table = json.load(f)
+        #     self.node_info_table = json.load(f)
 
         # 遍历每个节点的IP
         for ip, node_info in self.node_info_table.items():
@@ -1441,7 +1500,7 @@ class Node:
                 limit = 200,#500 TODO
                 device = self.device,
             )
-            print(f'Before Update in time {datetime.now()}: {results['results']}')
+            print(f"Before Update in time {datetime.now()}: {results['results']}")
             
             frequency_list,names_fre = map_to_range(self.captured_outputs,[])
             expert_output,names_out = map_to_range(self.captured_expert_output,[])
@@ -1473,7 +1532,7 @@ class Node:
                 limit = 200,#500 TODO
                 device = self.device,
             )
-            print(f'After Update in time {datetime.now()}: {results['results']}')
+            print(f"After Update in time {datetime.now()}: {results['results']}")
             
         # 设置定时任务，每隔一定时间触发更新操作
         # threading.Timer(10, self.model_inference_and_update).start()
@@ -1583,248 +1642,43 @@ class Node:
         func()
 
 
-def build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path='node_info.json', num_gpus=8):
-    # 随机生成唯一的IP地址
-    def generate_unique_ip(existing_ips):
-        while True:
-            ip = f"{random.randint(1, 255)}"
-            if ip not in existing_ips:
-                existing_ips.add(ip)
-                return ip
+if __name__ == '__main__':
+    import netifaces
+    import os
 
-    # 提取任务组和任务字典
-    task_group = expanded_task_list
-    # print(task_group)
-    # print(task_dict)
-    # 创建所有节点
-    nodes = []
-    ip_list = []
-    existing_ips = set()
+    # 获取本机IP
+    local_ip = get_local_ip('eth1')  # eth1 是你脚本里配置的网卡名
+    neighbors = get_neighbor_ips(local_ip)
 
-    # 使用轮循的方式分配 GPU
-    gpu_id_list = list(range(num_gpus)) * (num_nodes // num_gpus) + list(range(num_nodes % num_gpus))  # 轮流分配 GPU
+    # 可选：选择随机任务（或按机器编号指定）
+    task_list = [
+        'arc_easy', 'anli_r2', 'coqa', 'mnli', 'qnli', 'qqp', 'rte', 'wnli',
+        'mastermind_24_easy', 'mastermind_35_easy', 'logiqa', 'sciq',
+        'boolq', 'cb', 'copa', 'multirc', 'wic', 'wsc',
+        'truthfulqa_mc1', 'truthfulqa_mc2', 'truthfulqa_gen', 'winogrande'
+    ]
+    selected_task = random.choice(task_list)
 
-    # 存储已经分配的任务，确保任务不重复
-    assigned_tasks = set()
+    # 创建节点目录
+    os.makedirs("network_info", exist_ok=True)
 
-    for _ in range(num_nodes):
-        ip = generate_unique_ip(existing_ips)
-        ip_list.append(ip)
+    # 实例化本机节点
+    node = Node(
+        ip=local_ip,
+        args=args,
+        task=selected_task,
+        neighbors=neighbors,
+        info_table_path=f"network_info/{local_ip.replace('.', '_')}_info.json",
+        gpu_id=0  # 本地 GPU ID 可根据环境设置
+    )
 
-    # 为每个节点随机选择邻居
-    node_neighbors = {}
-    for ip in ip_list:
-        neighbors = random.sample([x for x in ip_list if x != ip], neighbors_count)
-        node_neighbors[ip] = neighbors
+    # 启动服务
+    node.initialize_model()
+    node.start_all_services()
 
-    # 确保邻居关系是双向的
-    for ip, neighbors in node_neighbors.items():
-        for neighbor in neighbors:
-            if ip not in node_neighbors[neighbor]:
-                node_neighbors[neighbor].append(ip)
-
-    # 保存每个节点的网络架构到独立文件
-    for ip, neighbors in node_neighbors.items():
-        # 每个节点对应一个独立的文件，确保文件名唯一
-        network_info_path = f"network_info/{ip}_network_info.json"
-        network_info = {ip: neighbors}
-        
-        with open(network_info_path, 'w') as f:
-            json.dump(network_info, f)
-            
-    # # 随机抽取 num_nodes 个任务 TODO
-    # if len(expanded_task_list) < num_nodes:
-    #     raise ValueError("expanded_task_list长度不足，无法为所有节点分配唯一任务")
-
-    selected_tasks = random.choices(expanded_task_list, k=num_nodes) #TODO
-    
-    # 创建节点实例，分配 GPU 和任务
-    nodes = []
-    for idx, (ip, neighbors) in enumerate(node_neighbors.items()):
-        gpu_id = gpu_id_list[idx]
-        selected_task = selected_tasks[idx] #TODO: selected_tasks[idx]expanded_task_list[0]
-
-        node = Node(
-            ip=ip,
-            args=args,
-            task=selected_task,
-            neighbors=neighbors,
-            info_table_path=f"network_info/{ip}_info.json",
-            gpu_id=gpu_id
-        )
-        nodes.append(node)
-
-    return nodes, node_neighbors
-
-def initialize_model_in_parallel(nodes):
-    """
-    以并行的方式初始化节点的模型，确保每组内部只有一个节点在同一时间进行初始化。
-    """
-    # 线程锁，用于确保每组内只有一个节点在同一时间进行初始化
-    group_locks = {group_id: threading.Lock() for group_id in range(6)}
-
-    def initialize_node(node):
-        with group_locks[node.gpu_id]:  # 确保同一组内节点是顺序进行初始化
-            node.initialize_model()
-
-    # 使用多线程并行初始化节点
-    threads = []
-    for node in nodes:
-        thread = threading.Thread(target=initialize_node, args=(node,))
-        threads.append(thread)
-        thread.start()
-
-    # 等待所有线程完成初始化
-    for thread in threads:
-        thread.join()
-        
-def initialize_model_sequentially(nodes):
-    """
-    顺序初始化模型，统一并发启动 Flask，并确认上线后，再统一启动推理。
-    """
-    # 【1】阶段1：顺序初始化模型
-    for node in nodes:
-        node.initialize_model()
-
-    # 【2】阶段2：启动所有节点的 Flask Server（并行启动）
-    threads = []
-    for node in nodes:
-        thread = threading.Thread(target=node.start_flask_server)
-        thread.start()
-        threads.append(thread)
-
-
-    # 启动多进程推理，每次最多运行 2 个节点
-    processes = start_nodes_with_limited_concurrency(nodes, max_concurrent=2)
-
+    # 主线程阻塞等待
     try:
-        for p in processes:
-            p.join()
+        while True:
+            time.sleep(3600)
     except KeyboardInterrupt:
         print("Exiting gracefully.")
-        for p in processes:
-            p.terminate()
-
-    print("All inference threads started.")
-
-# 示例使用
-num_nodes = 24
-neighbors_count = 4
-base_info_path = 'node_info.json'
-expanded_task_list = [
-            # 'AraDiCE_ArabicMMLU_high_humanities_history_egy',
-            # 'AraDiCE_ArabicMMLU_high_humanities_islamic-studies_lev',
-            # 'AraDiCE_piqa_egy',
-            # 'AraDiCE_ArabicMMLU_high_stem_biology_egy',
-            'arc_easy',
-            # 'arc_challenge',
-            # 'anagrams1',
-            'anli_r2',
-            'anli_r1',
-            # 'arabic_leaderboard_arabic_mmlu_high_school_statistics_light',
-            'coqa',
-            'eq_bench',
-            'fda',
-            'cola',
-            'mnli',
-            'mrpc',
-            'qnli',
-            'qqp',
-            'rte',
-            # 'sst',
-            'wnli',
-            # 'gpqa_main_zeroshot',
-            # 'gpqa_diamond_zeroshot',
-            # 'gpqa_extended_zeroshot',
-            # 'gpqa_main_n_shot',
-            # 'gpqa_diamond_n_shot',
-            # 'gpqa_extended_n_shot',
-            # 'gpqa_main_generative_n_shot',
-            # 'gpqa_diamond_generative_n_shot',
-            # 'gpqa_extended_generative_n_shot',
-            # 'gpqa_main_cot_zeroshot',
-            # 'gpqa_diamond_cot_zeroshot',
-            # 'gpqa_extended_cot_zeroshot',
-            # 'gpqa_main_cot_n_shot',
-            # 'gpqa_diamond_cot_n_shot',
-            # 'gpqa_extended_cot_n_shot',
-            # 'lambada_openai',
-            # 'lambada_standard',
-            # 'leaderboard_bbh_causal_judgement',
-            # 'leaderboard_bbh_disambiguation_qa',
-            # 'leaderboard_bbh_hyperbaton',
-            # # 'leaderboard_bbh_logical_deduction_five_objects',
-            # 'leaderboard_bbh_navigate',
-            # # 'leaderboard_bbh_object_counting',
-            # 'leaderboard_bbh_reasoning_about_colored_objects',
-            # 'leaderboard_bbh_ruin_names',
-            # # 'leaderboard_bbh_salient_translation_error_detection',
-            # # 'leaderboard_bbh_sports_understanding',
-            # 'leaderboard_bbh_temporal_sequences',
-            # # 'leaderboard_bbh_tracking_shuffled_objects_seven_objects',
-            # # 'leaderboard_bbh_tracking_shuffled_objects_three_objects',
-            # 'leaderboard_bbh_web_of_lies', 
-            'mastermind_24_easy',
-            # 'mastermind_24_hard',
-            'mastermind_35_easy',
-            # 'mastermind_35_hard',
-            'mastermind_46_easy',
-            # 'mastermind_46_hard',
-            'logiqa',
-            # # 'mmlu',
-            # 'mmlu_stem',
-            # 'mmlu_humanities',
-            # 'mmlu_other',
-            # # 'mmlu_pro_psychology',
-            # # 'mmlu_pro_physics',
-            # # 'mmlu_pro_philosophy',
-            # # 'mmlu_pro_other',
-            # # 'mmlu_pro_math',
-            # # 'mmlu_pro_law',
-            # # 'mmlu_pro_history',
-            # # 'mmlu_pro_health',
-            # # 'mmlu_pro_engineering',
-            # # 'mmlu_pro_economics',
-            # # 'mmlu_pro_computer_science',
-            # # 'mmlu_pro_chemistry',
-            # 'mmlu_social_sciences',
-            # 'openbookqa',
-            # 'piqa',
-            'sciq',
-            'boolq',
-            'cb',
-            'copa',
-            'multirc',
-            # 'record',
-            'rte',
-            'wic',
-            'wsc',
-            # 'super_glue-boolq-t5-prompt',
-            # 'super_glue-cb-t5-prompt',
-            # 'super_glue-copa-t5-prompt',
-            # 'super_glue-multirc-t5-prompt',
-            # 'super_glue-record-t5-prompt',
-            # 'super_glue-rte-t5-prompt',
-            # 'super_glue-wic-t5-prompt',
-            # 'super_glue-wsc-t5-prompt',
-            'truthfulqa_mc1',
-            'truthfulqa_mc2',
-            'truthfulqa_gen',
-            'winogrande',
-            # 'wikitext'
-            ]
-nodes, network_info = build_edge_network(num_nodes, neighbors_count, expanded_task_list, base_info_path)
-print(f"网络架构：{network_info}")
-
-# 启动节点初始化
-initialize_model_sequentially(nodes)
-
-# # 启动推理
-# for node in nodes:
-#     node.start_inference()
-
-try:
-    while True:
-        time.sleep(3600)
-except KeyboardInterrupt:
-    print("Exiting gracefully.")

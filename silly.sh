@@ -76,7 +76,7 @@ function install_dependencies()
 {
     echo "==> Installing conda and pip dependencies..." | tee -a $LOGF
     conda install -y cudatoolkit
-    pip install datasets==2.16.0 flask huggingface_hub
+    pip install datasets==2.16.0 flask huggingface_hub netifaces
 }
 
 function install_local_repository()

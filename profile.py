@@ -20,7 +20,7 @@ pc.defineParameter("nodeCount", "Number of Nodes", portal.ParameterType.INTEGER,
 
 # Pick your OS.
 imageList = [
-    ('default', 'Default Image'),
+    ('urn:publicid:IDN+wisc.cloudlab.us+image+lb-benchmark-PG0:moeUpdate1', 'Default Image'),
     ('urn:publicid:IDN+emulab.net+image+emulab-ops//UBUNTU18-64-STD', 'UBUNTU 18.04'),
     ('urn:publicid:IDN+wisc.cloudlab.us+image+nestfarm-PG0:HCL-U20', 'HCL U20.04'),
     ('urn:publicid:IDN+wisc.cloudlab.us+image+nestfarm-PG0:HCL-U2204', 'HCL U22.04'), # Ubuntu 22.04.1 Linux kernel 6.0
@@ -142,6 +142,7 @@ for i in range(params.nodeCount):
     # Add to lan
     if params.nodeCount > 1:
         iface = node.addInterface("eth1")
+        iface.addAddress(pg.IPv4Address("192.168.1." + str(i), "255.255.255.0"))
         lan.addInterface(iface)
         pass
     # Optional hardware type.
@@ -161,7 +162,7 @@ for i in range(params.nodeCount):
     pass
 
     # HCL: ``setup-host.sh`` will perform initial settings to the cloudlab node
-    node.addService(pg.Execute('/bin/sh','/local/repository/silly.sh'))
+    node.addService(pg.Execute(shell = "bash", command = '/local/repository/silly.sh'))
 
 # Print the generated rspec
 pc.printRequestRSpec(request)
