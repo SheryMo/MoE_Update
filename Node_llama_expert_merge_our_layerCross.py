@@ -1647,7 +1647,7 @@ if __name__ == '__main__':
     import os
 
     # 获取本机IP
-    local_ip = get_local_ip('eth1')  # eth1 是你脚本里配置的网卡名
+    local_ip = get_local_ip('eno1')  # eno1 是你脚本里配置的网卡名
     neighbors = get_neighbor_ips(local_ip)
 
     # 可选：选择随机任务（或按机器编号指定）

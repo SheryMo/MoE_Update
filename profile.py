@@ -141,7 +141,7 @@ for i in range(params.nodeCount):
         pass
     # Add to lan
     if params.nodeCount > 1:
-        iface = node.addInterface("eth1")
+        iface = node.addInterface("eno1")
         iface.addAddress(pg.IPv4Address("192.168.1." + str(i), "255.255.255.0"))
         lan.addInterface(iface)
         pass
