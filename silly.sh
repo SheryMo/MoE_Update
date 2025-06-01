@@ -126,7 +126,7 @@ function main()
     install_miniconda
     setup_conda_env
     install_dependencies
-    install_local_repository
+    # install_local_repository
     download_model
 
     echo "==> [$(date)] Setup complete. Activate with: conda activate silly_env" | tee -a $LOGF

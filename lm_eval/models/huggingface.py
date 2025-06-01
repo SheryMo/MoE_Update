@@ -596,6 +596,7 @@ class HFLM(TemplateLM):
                 revision=revision,
                 torch_dtype=get_dtype(dtype),
                 trust_remote_code=trust_remote_code,
+                use_safetensors=True, 
                 gguf_file=gguf_file,
                 quantization_config=quantization_config,
                 **model_kwargs,

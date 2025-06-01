@@ -530,7 +530,7 @@ class Node:
         # self.task_dict = extract_task_dict('/root/mo-e_-merge_and_-update_-mec/logs11.log', self.task_group)
 
         # 加载tokenizer
-        self.tokenizer = AutoTokenizer.from_pretrained("llama-moe/LLaMA-MoE-v1-3_5B-2_8", trust_remote_code=True)
+        self.tokenizer = AutoTokenizer.from_pretrained("llama-moe/LLaMA-MoE-v1-3_5B-2_8", trust_remote_code=True, use_fast=False)
         self.task_manager = lm_eval.tasks.TaskManager()
         print(self.ip)
         print(self.device)
